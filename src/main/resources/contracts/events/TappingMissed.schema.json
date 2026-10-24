@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.agrosphere.invalid/events/operations/v1/TappingMissed.schema.json",
+  "title": "TappingMissed",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "const": "TappingMissed"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "const": "agrosphere-operations-service"
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "estateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "blockId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dataProvenance": {
+      "enum": [
+        "REAL",
+        "SIMULATED",
+        "ESTIMATED",
+        "PREDICTED"
+      ]
+    },
+    "aggregateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregateVersion": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "assignment": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "scheduleId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "estateId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "blockId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "workerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "tappingDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "plannedTreeCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "status": {
+              "const": "MISSED"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "version": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "createdBy": {
+              "type": "string"
+            },
+            "updatedBy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "scheduleId",
+            "estateId",
+            "blockId",
+            "workerId",
+            "tappingDate",
+            "plannedTreeCount",
+            "status",
+            "createdAt",
+            "updatedAt",
+            "version",
+            "createdBy",
+            "updatedBy"
+          ],
+          "additionalProperties": false
+        },
+        "execution": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "assignmentId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "workerId": {
+                  "type": "string"
+                },
+                "estateId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "blockId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "tappingDate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "plannedTreeCount": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "actualTreeCount": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "startedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "completedAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "notes": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdBy": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "assignmentId",
+                "workerId",
+                "estateId",
+                "blockId",
+                "tappingDate",
+                "plannedTreeCount",
+                "actualTreeCount",
+                "startedAt",
+                "completedAt",
+                "notes",
+                "createdBy",
+                "createdAt",
+                "updatedAt"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missedReason": {
+          "type": "object",
+          "properties": {
+            "assignmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "reasonCode": {
+              "enum": [
+                "RAIN",
+                "WORKER_UNAVAILABLE",
+                "TREE_RESTING",
+                "ACCESS_RESTRICTED",
+                "OTHER"
+              ]
+            },
+            "remarks": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "recordedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "recordedBy": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "assignmentId",
+            "reasonCode",
+            "remarks",
+            "recordedAt",
+            "recordedBy"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "assignment",
+        "execution",
+        "missedReason"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "timestamp",
+    "source",
+    "correlationId",
+    "estateId",
+    "blockId",
+    "dataProvenance",
+    "aggregateId",
+    "aggregateVersion",
+    "payload"
+  ],
+  "additionalProperties": false
+}

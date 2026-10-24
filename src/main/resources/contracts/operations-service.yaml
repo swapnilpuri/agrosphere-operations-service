@@ -1,0 +1,2029 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AgroSphere Rubber Tapping Operations",
+    "description": "Milestone 3A. UTC audit instants; estate-local inclusive tapping dates. Mutations require version; identical terminal retries are no-ops. Generation recurrence: DAILY or EVERY_N_DAYS:n. Pages 0-based, sizes 1..100. See ADR 0012 for authorization and retry policies.",
+    "version": "0.2.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/v1/tapping/schedules": {
+      "get": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "schedules",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TappingSchedule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/schedules/{id}/suspend": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "suspend",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/schedules/{id}/generate-assignments": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "generate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Generate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/schedules/{id}/close": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "close",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/schedules/{id}/activate": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments": {
+      "get": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "assignments",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "workerId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "createAssignment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TappingAssignment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments/{id}/start": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "start",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments/{id}/mark-missed": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "missed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Missed"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments/{id}/complete": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "complete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Complete"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments/{id}/cancel": {
+      "post": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/schedules/{id}": {
+      "get": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "schedule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "edit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleEdit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments/{id}/worker": {
+      "patch": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "worker",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/summary": {
+      "get": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "summary",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "workerId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "groupBy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "total"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/records": {
+      "get": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "records",
+        "parameters": [
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "blockId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "workerId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tapping/assignments/{id}": {
+      "get": {
+        "tags": [
+          "tapping-controller"
+        ],
+        "operationId": "assignment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid request or state transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "403": {
+            "description": "Role, estate or assignment access denied",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "404": {
+            "description": "Resource missing",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "409": {
+            "description": "Stale version or duplicate occurrence",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "422": {
+            "description": "Invalid estate/block reference",
+            "content": {
+              "application/problem+json": {}
+            }
+          },
+          "503": {
+            "description": "Estate dependency unavailable",
+            "content": {
+              "application/problem+json": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ScheduleWrite": {
+        "type": "object",
+        "properties": {
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "blockId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          },
+          "recurrenceRule": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plannedTreeCount": {
+            "type": "integer",
+            "format": "int32",
+            "exclusiveMinimum": 0
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "blockId",
+          "effectiveFrom",
+          "estateId",
+          "name",
+          "recurrenceRule"
+        ]
+      },
+      "ProblemDetail": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "TappingSchedule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "blockId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "recurrenceRule": {
+            "type": "string"
+          },
+          "plannedTreeCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "SUSPENDED",
+              "CLOSED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "Generate": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "workerId": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "version",
+          "workerId"
+        ]
+      },
+      "AssignmentWrite": {
+        "type": "object",
+        "properties": {
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "blockId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workerId": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          },
+          "tappingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "plannedTreeCount": {
+            "type": "integer",
+            "format": "int32",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "blockId",
+          "estateId",
+          "tappingDate",
+          "workerId"
+        ]
+      },
+      "TappingAssignment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scheduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "blockId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workerId": {
+            "type": "string"
+          },
+          "tappingDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "plannedTreeCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PLANNED",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "MISSED",
+              "CANCELLED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "Missed": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "reasonCode": {
+            "type": "string",
+            "enum": [
+              "RAIN",
+              "WORKER_UNAVAILABLE",
+              "TREE_RESTING",
+              "ACCESS_RESTRICTED",
+              "OTHER"
+            ]
+          },
+          "remarks": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "reasonCode",
+          "version"
+        ]
+      },
+      "Complete": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "actualTreeCount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "actualTreeCount",
+          "version"
+        ]
+      },
+      "ScheduleEdit": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          },
+          "recurrenceRule": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plannedTreeCount": {
+            "type": "integer",
+            "format": "int32",
+            "exclusiveMinimum": 0
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveTo": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "effectiveFrom",
+          "name",
+          "recurrenceRule",
+          "version"
+        ]
+      },
+      "WorkerWrite": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "workerId": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "version",
+          "workerId"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

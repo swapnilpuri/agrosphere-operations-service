@@ -10,27 +10,51 @@ spring:
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: validate
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
   flyway:
     enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
   rabbitmq:
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
     host: ${RABBITMQ_HOST:localhost}
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
 server:
+  shutdown: graceful
   port: ${SERVER_PORT:8083}
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
   endpoint:
     health:
+      group:
+        readiness:
+          include: readinessState,db
+        liveness:
+          include: livenessState
       probes:
         enabled: true
   tracing:
     sampling:
       probability: 0.1
+
+operations:
+  security:
+    audience: ${OIDC_AUDIENCE:operations-service}
+  estate-url: ${ESTATE_SERVICE_URL:http://localhost:8081}
+  estate-timeout-seconds: ${ESTATE_TIMEOUT_SECONDS:3}
+  data-provenance: ${EVENT_DATA_PROVENANCE:REAL}
+  outbox:
+    enabled: ${OUTBOX_PUBLICATION_ENABLED:true}
+logging:
+  structured:
+    format:
+      console: logstash

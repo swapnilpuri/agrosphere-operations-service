@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.agrosphere.invalid/events/operations/v1/TappingScheduleActivated.schema.json",
+  "title": "TappingScheduleActivated",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "const": "TappingScheduleActivated"
+    },
+    "eventVersion": {
+      "const": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "const": "agrosphere-operations-service"
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "estateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "blockId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dataProvenance": {
+      "enum": [
+        "REAL",
+        "SIMULATED",
+        "ESTIMATED",
+        "PREDICTED"
+      ]
+    },
+    "aggregateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregateVersion": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "estateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "blockId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "recurrenceRule": {
+          "type": "string",
+          "pattern": "^(DAILY|EVERY_N_DAYS:[1-9][0-9]{0,2})$"
+        },
+        "plannedTreeCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "effectiveFrom": {
+          "type": "string",
+          "format": "date"
+        },
+        "effectiveTo": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "DRAFT",
+            "ACTIVE",
+            "SUSPENDED",
+            "CLOSED"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "updatedBy": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "estateId",
+        "blockId",
+        "name",
+        "recurrenceRule",
+        "plannedTreeCount",
+        "effectiveFrom",
+        "effectiveTo",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "version",
+        "createdBy",
+        "updatedBy"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "timestamp",
+    "source",
+    "correlationId",
+    "estateId",
+    "blockId",
+    "dataProvenance",
+    "aggregateId",
+    "aggregateVersion",
+    "payload"
+  ],
+  "additionalProperties": false
+}
