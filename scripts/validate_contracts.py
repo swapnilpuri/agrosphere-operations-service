@@ -2,6 +2,7 @@
 import copy,json
 from pathlib import Path
 import yaml
+from contract_comparison import resolve
 from jsonschema import Draft202012Validator,FormatChecker
 from openapi_spec_validator import validate
 root=Path(__file__).resolve().parents[1]
@@ -12,14 +13,6 @@ expected={(p,m) for p,methods in api['paths'].items() for m in methods if m in (
 actual={(p,m) for p,methods in runtime['paths'].items() for m in methods if m in ('get','post','patch')}
 assert expected==actual,(expected-actual,actual-expected)
 # Resolve local response and request schemas, preserving meaningful constraints.
-def resolve(node,doc):
-    if isinstance(node,list): return [resolve(x,doc) for x in node]
-    if not isinstance(node,dict): return node
-    if '$ref' in node:
-        target=doc
-        for key in node['$ref'].removeprefix('#/').split('/'): target=target[key]
-        return resolve(target,doc)
-    return {k:resolve(v,doc) for k,v in node.items() if k not in ('description','title','example','examples')}
 for p,m in expected:
     pinned=api['paths'][p][m];live=runtime['paths'][p][m]
     for key in ('requestBody','parameters','responses'):

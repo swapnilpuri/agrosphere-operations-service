@@ -51,6 +51,7 @@ class TappingServiceIT {
   static void start() throws Exception {
     postgres = new PostgreSQLContainer("postgres:17-alpine");
     postgres.start();
+    CollectionTestSupport.provisionNoLoginRuntimeRole(postgres);
     broker =
         new GenericContainer<>("rabbitmq:4.3.6-management")
             .withExposedPorts(5672)
@@ -93,6 +94,8 @@ class TappingServiceIT {
             "--spring.datasource.url=" + postgres.getJdbcUrl(),
             "--spring.datasource.username=" + postgres.getUsername(),
             "--spring.datasource.password=" + postgres.getPassword(),
+            "--spring.flyway.user=" + postgres.getUsername(),
+            "--spring.flyway.password=" + postgres.getPassword(),
             "--spring.security.oauth2.resourceserver.jwt.issuer-uri=" + issuer,
             "--OIDC_JWK_SET_URI=" + issuer + "/jwks",
             "--operations.estate-url=" + issuer,
@@ -192,9 +195,11 @@ class TappingServiceIT {
   @Order(1)
   void migrationsScheduleAndGeneration() throws Exception {
     assertEquals(
-        2,
+        3,
         jdbc.queryForObject(
-            "select count(*) from flyway_schema_history where success", Integer.class));
+            "select count(*) from flyway_schema_history where success and version is not null", Integer.class));
+    assertEquals(2, jdbc.queryForObject(
+        "select count(*) from flyway_schema_history where success and version in ('1','2')", Integer.class));
     var data =
         Map.of(
             "estateId",

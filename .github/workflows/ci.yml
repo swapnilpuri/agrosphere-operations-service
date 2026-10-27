@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -18,5 +20,6 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: chmod +x mvnw
       - run: ./mvnw --batch-mode --no-transfer-progress verify -Pintegration
+      - run: python scripts/validate_collection_pins.py --snapshots target/collection-snapshots
       - run: python scripts/validate_contracts.py
       - run: docker build -t agrosphere-operations-service:ci .
