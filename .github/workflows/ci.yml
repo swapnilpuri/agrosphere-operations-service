@@ -20,6 +20,8 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: chmod +x mvnw
       - run: ./mvnw --batch-mode --no-transfer-progress verify -Pintegration
-      - run: python scripts/validate_collection_pins.py --snapshots target/collection-snapshots
+      - run: python scripts/validate_collection_pins.py --snapshots target/collection-snapshots --events target/collection-events --api-responses target/collection-api
+      - run: python -m unittest discover -s scripts -p 'test_contract_comparison.py'
+      - run: python scripts/test_collection_projection.py
       - run: python scripts/validate_contracts.py
       - run: docker build -t agrosphere-operations-service:ci .

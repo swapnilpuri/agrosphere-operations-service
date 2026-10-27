@@ -129,13 +129,64 @@ class CollectionServiceIT {
     assertEquals(409,assertThrows(ResponseStatusException.class,()->create("RACE")).getStatusCode().value());
   }
 
-  @Test void staleMeasurementAndVoidWritersRollbackTheirReservations()throws Exception{
+  @Test void concurrentMeasurementsRollbackLosingReservation()throws Exception{
     var id=id(create("RACE"));var barrier=new CyclicBarrier(2);
     try(var pool=Executors.newFixedThreadPool(2)){
       Callable<Integer> measurement=()->{manager();try{barrier.await(5,TimeUnit.SECONDS);return service.mutate("DRC",id,UUID.randomUUID().toString(),drc(0)).status();}catch(ResponseStatusException ex){return ex.getStatusCode().value();}finally{SecurityContextHolder.clearContext();}};
       var results=pool.invokeAll(List.of(measurement,measurement));var status=results.stream().map(f->{try{return f.get();}catch(Exception ex){throw new RuntimeException(ex);}}).sorted().toList();assertEquals(List.of(200,409),status);
     }
     assertEquals(2,counts().get("collection_command"));assertEquals(1,counts().get("drc_measurement"));assertEquals(2,counts().get("collection_revision"));
+  }
+
+  @Test void differentKeysSameReferenceAndCorrectionVersusVoidRace()throws Exception{
+    var barrier=new CyclicBarrier(2);
+    try(var pool=Executors.newFixedThreadPool(2)){
+      Callable<Integer> job=()->{manager();try{barrier.await(5,TimeUnit.SECONDS);return create(" UNIQUE ").status();}catch(ResponseStatusException ex){return ex.getStatusCode().value();}finally{SecurityContextHolder.clearContext();}};
+      var results=pool.invokeAll(List.of(job,job));assertEquals(List.of(201,409),results.stream().map(f->{try{return f.get();}catch(Exception ex){throw new RuntimeException(ex);}}).sorted().toList());
+    }
+    assertEquals(1,counts().get("latex_collection"));assertEquals(1,counts().get("collection_command"));
+    var id=db.queryForObject("SELECT id FROM latex_collection",UUID.class);
+    try(var pool=Executors.newFixedThreadPool(2)){
+      var jobs=List.<Callable<Integer>>of(()->raceMutation(barrier,"CORRECT",id,"{\"version\":0,\"reason\":\"scale\",\"wetLatexKg\":100}"),()->raceMutation(barrier,"VOID",id,"{\"version\":0,\"reason\":\"duplicate\"}"));
+      var results=pool.invokeAll(jobs);assertEquals(List.of(200,409),results.stream().map(f->{try{return f.get();}catch(Exception ex){throw new RuntimeException(ex);}}).sorted().toList());
+    }
+    assertEquals(2,counts().get("collection_command"));assertEquals(2,counts().get("collection_revision"));assertEquals(1,counts().get("collection_adjustment"));assertEquals(2,counts().get("outbox_event"));
+  }
+
+  int raceMutation(CyclicBarrier barrier,String command,UUID id,String body)throws Exception{
+    manager();try{barrier.await(5,TimeUnit.SECONDS);return service.mutate(command,id,UUID.randomUUID().toString(),body).status();}catch(ResponseStatusException ex){return ex.getStatusCode().value();}finally{SecurityContextHolder.clearContext();}
+  }
+
+  @Test void evidenceAndAdjustmentFailuresRollbackAndKeyCanBeRetried(){
+    var id=id(create("FAULT"));var named=new NamedParameterJdbcTemplate(db.getDataSource());
+    for(String phase:List.of("measurement","adjustment")){
+      var store=new CollectionStore(named){
+        @Override public void append(DrcMeasurement m,CollectionScope scope){super.append(m,scope);if(phase.equals("measurement"))throw new IllegalStateException("injected after evidence");}
+        @Override public void append(CollectionAdjustment a,CollectionScope scope){super.append(a,scope);if(phase.equals("adjustment"))throw new IllegalStateException("injected after adjustment");}
+      };
+      var testService=new CollectionService(store,context.getBean(CollectionReplayStore.class),context.getBean(CollectionReferenceValidation.class),context.getBean(CollectionEventPort.class),context.getBean(CollectionAccess.class),context.getBean(Access.class),context.getBean(Clock.class),context.getBean(PlatformTransactionManager.class));
+      var command=phase.equals("measurement")?"DRC":"CORRECT";
+      var body=phase.equals("measurement")?drc(0):"{\"version\":0,\"reason\":\"scale\",\"wetLatexKg\":100}";
+      var key=UUID.randomUUID().toString();var before=counts();
+      assertThrows(IllegalStateException.class,()->testService.mutate(command,id,key,body));assertEquals(before,counts());
+      assertTrue(context.getBean(CollectionReplayStore.class).replay("manager",UUID.fromString(key),CollectionCommands.hash(CollectionCommands.BASE+"/"+id+(command.equals("DRC")?"/drc-measurements":"/corrections"),CollectionCommands.parse(command,body))).isEmpty());
+    }
+  }
+
+  @Test void dateCorrectionMovesCurrentContributionAndRetainsOldHistory()throws Exception{
+    var previous=Instant.now().minusSeconds(86400).truncatedTo(java.time.temporal.ChronoUnit.MICROS);
+    var oldDate=previous.atZone(ZoneOffset.UTC).toLocalDate();var newDate=LocalDate.now(ZoneOffset.UTC);
+    db.update("UPDATE tapping_record SET tapping_date=?,started_at=?,completed_at=? WHERE id=?",oldDate,Timestamp.from(previous.minusSeconds(120)),Timestamp.from(previous.minusSeconds(60)),record);
+    db.update("UPDATE tapping_assignment SET tapping_date=? WHERE id=(SELECT assignment_id FROM tapping_record WHERE id=?)",oldDate,record);
+    collected=previous.toString();
+    var raw=json.readValue(createBody("DATE"),Map.class);raw.put("backdateReason","SIMULATED prior-day observation");
+    var created=service.mutate("CREATE",null,UUID.randomUUID().toString(),json.writeValueAsString(raw));var id=id(created);
+    service.mutate("CORRECT",id,UUID.randomUUID().toString(),json.writeValueAsString(new LinkedHashMap<String,Object>(){{put("version",0);put("reason","SIMULATED date correction");put("collectedAt",Instant.now().minusSeconds(5).truncatedTo(java.time.temporal.ChronoUnit.MICROS));put("backdateReason",null);}}));
+    assertEquals(newDate,service.read(id).collectionDate());
+    var summary=json.readTree(http("GET","/summary?from="+oldDate+"&to="+oldDate+"&groupBy=date",null,null,200).body());assertEquals(0,summary.path("totalElements").asInt());
+    var history=json.readTree(http("GET","/"+id+"/history",null,null,200).body());assertTrue(history.toString().contains(oldDate.toString()));assertTrue(history.toString().contains(newDate.toString()));
+    var folder=Path.of("target/collection-date-events");Files.createDirectories(folder);
+    for(var event:db.queryForList("SELECT event_type,payload::text AS body FROM outbox_event"))Files.writeString(folder.resolve(event.get("event_type")+".json"),(String)event.get("body"));
   }
 
   @Test void failureAfterRootRevisionOutboxOrReceiptRollsBackEverything(){
