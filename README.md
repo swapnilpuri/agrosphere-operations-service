@@ -10,13 +10,13 @@ Dockerfile uses pinned Maven 3.9.12 / Temurin 25, executes unit tests, and produ
 
 ## Runtime
 
-Set DB_URL, DB_USER, DB_PASSWORD, OIDC_ISSUER_URI, RABBITMQ_USER and RABBITMQ_PASSWORD privately. OIDC_JWK_SET_URI can select internal Keycloak certificates while preserving public issuer validation. OIDC_AUDIENCE defaults to operations-service. ESTATE_SERVICE_URL defaults to http://localhost:8081; ESTATE_TIMEOUT_SECONDS defaults to 3 (1â€“30). OUTBOX_PUBLICATION_ENABLED defaults true; EVENT_DATA_PROVENANCE defaults REAL (use SIMULATED locally). Spring does not load .env directly.
+Set DB_URL, DB_USER, DB_PASSWORD, FLYWAY_USER, FLYWAY_PASSWORD, OIDC_ISSUER_URI, RABBITMQ_USER and RABBITMQ_PASSWORD privately. OIDC_JWK_SET_URI can select internal Keycloak certificates while preserving public issuer validation. OIDC_AUDIENCE defaults to operations-service. ESTATE_SERVICE_URL defaults to http://localhost:8081; ESTATE_TIMEOUT_SECONDS defaults to 3 (1â€“30). OUTBOX_PUBLICATION_ENABLED defaults true; EVENT_DATA_PROVENANCE defaults REAL (use SIMULATED locally). Spring does not load .env directly.
 
 Server port 8083; health/liveness/readiness are public, business routes and /v3/api-docs require valid JWT. Readiness checks the local database. /actuator/metrics requires authentication and exposes operations.outbox.backlog and operations.outbox.failed. Audit times are UTC instants; requests carry estate-local ISO dates. Correlation header X-Correlation-ID is a UUID; missing/invalid values are replaced and returned. Logs use structured JSON without credentials. Shutdown is graceful and Hikari pooling is bounded.
 
 ## API
 
-All business endpoints start /api/v1/tapping. Full independently versioned OpenAPI snapshot: src/main/resources/contracts/operations-service.yaml, from contracts 0.4.0.
+All business endpoints start /api/v1/tapping. Full independently versioned OpenAPI snapshot: src/main/resources/contracts/operations-service.yaml, from locally accepted Contracts 0.5.0 (18 tapping and 9 collection operations).
 
 | Resource | Methods / suffixes |
 |---|---|
@@ -57,14 +57,23 @@ The transactional outbox only publishes committed state, waits for confirms, che
 
 Architecture decisions, seven PlantUML diagrams, examples and verified results are in the independent Architecture repository, docs/milestones/milestone-3a-*.md and ADR 0012.
 
-## Milestone 3B domain increment (unreleased)
+## Milestone 3B local implementation (unreleased)
 
-T02 adds immutable collection/measurement/revision/adjustment records and exact BigDecimal calculation/lifecycle rules. Domain tests use a fixed clock and cover microsecond precision, timezone/DST, corrections and void evidence. No collection endpoint, migration or messaging writer is enabled. Application authorization, durable replay/transactions and database-level uniqueness remain future T03–T07 work; do not expose the domain directly as a REST DTO. Existing tapping contracts remain pinned to 0.4.0 until independent contract review/release. Run ./mvnw.cmd verify with JDK 25.
+Collection routes under /api/v1/tapping/collections support creation, scoped list/get/history/measurements, initial DRC, corrections, void and summaries. Every write requires a UUID Idempotency-Key. Receipts retain the original status/body/Location even after later revisions; current role/estate/worker authorization is checked again before replay. Normalization policy 1 treats equivalent decimals, offsets and normalized references consistently. A competing reservation waits at most three seconds and returns retryable 409; retry with the original key.
 
-## Milestone 3B persistence/reference increment (unreleased application)
+Weight uses exact JSON decimals (three places), DRC two places, and dry mass HALF_UP to three places. No DRC means pending/null; measured zero remains calculated. Observations require explicit offsets and exact microsecond representation (additional trailing zeros accepted). Snapshot estate zone, division, versions and ownership remain historical. Both date bounds are optional for lists; a single bound is invalid. Summaries require both bounds and at most a 366-day difference, keep provenance separate, sum rounded lots and report pending coverage. Grouping supports total/estate/division/block/worker/date.
 
-Contracts 0.5.0 is locally accepted and pinned (five exact artifacts; no remote publication). Additive V3 owns collection roots, measurements, immutable revisions/adjustments and command receipts; CollectionStore scopes reads before pagination/history and uses conditional writes inside application transactions. CollectionAccess has separate positive operation permissions; EstateHttpClient adds typed collection metadata without changing the 3A timezone port.
+V3 is additive and requires a separately provisioned restricted agrosphere_operations_app login. DB_USER/DB_PASSWORD select runtime; FLYWAY_USER/FLYWAY_PASSWORD select the migration owner, without credential fallback. Public .env.example contains placeholders only. The Infrastructure OPERATIONS_RUNTIME_CREDENTIALS runbook documents operator sequencing; no existing private file or running stack was provisioned. Integration tests use generated logins, prove denied DDL/evidence mutation/cross-database access, restore backups into a separate disposable database and run the pinned prior 3A image against retained V3 evidence with migrations disabled. Application rollback retains V3 tables and audit; no automatic down migration is supplied.
 
-V3 requires a pre-provisioned restricted agrosphere_operations_app role. Runtime/Flyway credential wiring is deliberately not changed yet because secret-handling changes remain unauthorized. Do not launch this intermediate build against existing environments before the reviewed operator provisioning/configuration step. Disposable tests use a NOLOGIN role with SET ROLE; separate runtime-login proof and previous-3A-image rehearsal remain outstanding. Existing private environment files and running stacks are untouched.
+Four collection event types use v2, full current snapshots and one event per committed revision; tapping remains v1. Infrastructure declares a separate durable bounded development sink with four explicit v2 bindings. Real broker tests cover confirms, mandatory returns, nacks, confirm timeout, outage recovery and duplicate delivery after an ACK/database crash window. Delivery remains at least once; scripts/test_collection_projection.py is an isolated test-only reconciliation harness, not a shipped Analytics consumer.
 
-Run python scripts/validate_collection_pins.py --snapshots target/collection-snapshots after integration for artifact integrity and actual snapshot schema validation. The original scripts/validate_contracts.py remains strict: it currently reports nine missing collection operations because the pinned contract has 27 operations while T06 endpoints are not implemented. It must pass against the full runtime before acceptance; no validator is weakened to hide the gap.
+After ./mvnw.cmd verify -Pintegration on JDK 25, run:
+
+~~~powershell
+python scripts/validate_collection_pins.py --snapshots target/collection-snapshots --events target/collection-events --api-responses target/collection-api
+python scripts/validate_contracts.py
+python -m unittest discover -s scripts -p test_contract_comparison.py
+python scripts/test_collection_projection.py
+~~~
+
+Use requirements-dev.txt in an isolated Python environment. Collection OpenAPI documentation is contract-first: the customizer verifies actual registered paths/methods, then applies the pinned operation/schema definitions. The strict comparator checks all 27 operations and constraints, normalizing only required-field ordering and local references. Separate HTTP integration tests validate enforcement and actual responses; documentation equality alone is not runtime proof. Target exports/logs are ignored and regenerated by integration tests. Milestone acceptance and outstanding checks are recorded in Architecture DEVELOPMENT_CHECKPOINT.md; no production deployment or remote publication is implied.

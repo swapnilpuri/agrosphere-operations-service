@@ -63,20 +63,22 @@ class Projection:
 
 
 class ReconciliationTest(unittest.TestCase):
+    def projection(self):
+        value=Projection();self.addCleanup(value.db.close);return value
     @classmethod
     def setUpClass(cls):
         cls.events=[json.loads((ROOT/'target/collection-events'/(name+'.json')).read_text(),parse_float=Decimal) for name in ['LatexCollectionRecorded','DrcMeasurementRecorded','LatexCollectionAdjusted','LatexCollectionVoided']]
         cls.dates=[json.loads((ROOT/'target/collection-date-events'/(name+'.json')).read_text(),parse_float=Decimal) for name in ['LatexCollectionRecorded','LatexCollectionAdjusted']]
 
     def test_duplicate_stale_gap_and_void_tombstone(self):
-        p=Projection()
+        p=self.projection()
         for index in [2,0,2,1,3,0]:p.apply(self.events[index])
         self.assertEqual({},p.contributions())
         self.assertEqual((3,1),p.db.execute('SELECT version,gap FROM current').fetchone())
         self.assertEqual(4,p.db.execute('SELECT count(*) FROM seen').fetchone()[0])
 
     def test_conflicting_same_version_and_same_event_id_are_rejected(self):
-        p=Projection();p.apply(self.events[0]); conflicting=json.loads(canonical(self.events[0]),parse_float=Decimal)
+        p=self.projection();p.apply(self.events[0])
         # Change a valid string field while retaining all numeric values/types.
         conflicting=self.events[0]|{'source':'agrosphere-operations-service','eventId':'00000000-0000-0000-0000-000000000001','payload':self.events[0]['payload']|{'collection':self.events[0]['payload']['collection']|{'collectionReference':'OTHER'}}}
         with self.assertRaises(ValueError):p.apply(conflicting)
@@ -84,19 +86,19 @@ class ReconciliationTest(unittest.TestCase):
         self.assertEqual(1,p.db.execute('SELECT count(*) FROM seen').fetchone()[0])
 
     def test_projection_and_dedup_ledger_commit_atomically(self):
-        p=Projection()
+        p=self.projection()
         with self.assertRaises(RuntimeError):p.apply(self.events[0],fault=True)
         self.assertEqual(0,p.db.execute('SELECT count(*) FROM seen').fetchone()[0]);self.assertEqual({},p.contributions())
         p.apply(self.events[0]);self.assertEqual(1,len(p.contributions()))
 
     def test_actual_date_correction_moves_only_current_contribution(self):
-        p=Projection();p.apply(self.dates[0]);before=p.contributions();p.apply(self.dates[1]);after=p.contributions()
+        p=self.projection();p.apply(self.dates[0]);before=p.contributions();p.apply(self.dates[1]);after=p.contributions()
         self.assertNotEqual(set(before),set(after));self.assertEqual(list(before.values()),list(after.values()))
         p.apply(self.dates[0]);self.assertEqual(after,p.contributions())
 
     def test_invalid_or_unsupported_events_have_bounded_retry_and_dlq(self):
         for invalid in [self.events[0]|{'eventVersion':99},self.events[0]|{'extra':'not permitted'}]:
-            p=Projection()
+            p=self.projection()
             for attempt in range(10):self.assertEqual('rejected',p.apply(invalid))
             self.assertEqual((3,1),p.db.execute('SELECT attempts,dlq FROM rejected').fetchone());self.assertEqual({},p.contributions())
 

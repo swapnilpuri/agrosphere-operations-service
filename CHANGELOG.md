@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased - 2026-10-27 local Milestone 3B
+
+Collection command/API/query/v2 outbox implementation with durable replay, scoped exact-decimal summaries, separate runtime/Flyway credentials, generated-only integration/backup/prior-image drills and strict 27-operation validation. Existing tapping semantics and v1 event bytes retained. Local implementation only; no deployment or remote publication.
+
 ## Unreleased - 2026-10-27 persistence and references
 
 Pinned owner-accepted local Contracts 0.5.0 artifacts. Added V3 evidence/receipt constraints and restricted grants, scoped JDBC collection persistence, exact wire snapshots, positive collection permissions and typed fail-closed Estate reference validation. Disposable schema/store tests and signed JWT/reference tests added; credential wiring remains excluded and collection HTTP/application replay/event flows remain incomplete. No deployment or active database action.

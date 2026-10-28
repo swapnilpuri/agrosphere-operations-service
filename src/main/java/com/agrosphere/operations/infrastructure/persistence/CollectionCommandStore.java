@@ -26,8 +26,15 @@ public class CollectionCommandStore implements CollectionReplayStore {
 
   public boolean reserve(String actor,UUID key,String hash,String path,Instant now){
     db.getJdbcTemplate().execute("SET LOCAL lock_timeout='3s'");
-    return db.update("INSERT INTO collection_command(actor,idempotency_key,request_hash,normalization_version,method,resource_path,created_at) VALUES (:actor,:key,:hash,1,'POST',:path,:now) ON CONFLICT DO NOTHING",
-        new MapSqlParameterSource("actor",actor).addValue("key",key).addValue("hash",hash).addValue("path",path).addValue("now",Timestamp.from(now)))==1;
+    try {
+      return db.update("INSERT INTO collection_command(actor,idempotency_key,request_hash,normalization_version,method,resource_path,created_at) VALUES (:actor,:key,:hash,1,'POST',:path,:now) ON CONFLICT DO NOTHING",
+          new MapSqlParameterSource("actor",actor).addValue("key",key).addValue("hash",hash).addValue("path",path).addValue("now",Timestamp.from(now)))==1;
+    } catch (org.springframework.jdbc.UncategorizedSQLException ex) {
+      // PostgreSQL lock_timeout is 55P03; Spring's fallback translator may leave it uncategorized.
+      if ("55P03".equals(ex.getSQLException().getSQLState()))
+        throw new org.springframework.dao.CannotAcquireLockException("Collection command reservation busy",ex);
+      throw ex;
+    }
   }
 
   public Receipt complete(String actor,UUID key,UUID id,int status,String location,String body,Instant now){

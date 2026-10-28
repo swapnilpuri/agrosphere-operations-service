@@ -130,4 +130,11 @@ class OutboxDispatcherTest {
     dispatcher().dispatch();
     verify(jdbc).update(contains("next_attempt_at"), eq(1), eq("PENDING"), any(), eq(id));
   }
+
+  @Test void missingConfirmationTimesOutWithoutPublishedMark() {
+    pending(0);
+    dispatcher().dispatch();
+    verify(jdbc).update(contains("next_attempt_at"), eq(1), eq("PENDING"), any(), eq(id));
+    verify(jdbc,never()).update(contains("delivery_status='PUBLISHED'"),eq(id));
+  }
 }

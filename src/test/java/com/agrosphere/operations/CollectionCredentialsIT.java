@@ -109,7 +109,18 @@ class CollectionCredentialsIT {
     assertEquals(c,repository.find(c.id(),new CollectionScope(List.of(estate),null)).orElseThrow());
   }
 
-  @Test @Order(3) void previous3aImageRunsWithRestrictedLoginAgainstV3WithoutDeletingEvidence()throws Exception{
+  @Test @Order(3) void backupRestoresEvidenceIntoSeparateDisposableDatabase()throws Exception{
+    var backup=postgres.execInContainer("sh","-ec","PGPASSWORD=\"$POSTGRES_PASSWORD\" pg_dump -U \"$POSTGRES_USER\" -d agrosphere_operations -Fc -f /tmp/collection-evidence.dump; PGPASSWORD=\"$POSTGRES_PASSWORD\" createdb -U \"$POSTGRES_USER\" collection_restore; PGPASSWORD=\"$POSTGRES_PASSWORD\" pg_restore -U \"$POSTGRES_USER\" -d collection_restore --exit-on-error /tmp/collection-evidence.dump");
+    assertEquals(0,backup.getExitCode(),"Disposable backup/restore must succeed");
+    var restored=new JdbcTemplate(new org.springframework.jdbc.datasource.DriverManagerDataSource(jdbcUrl.replace("/agrosphere_operations","/collection_restore"),postgres.getUsername(),postgres.getPassword()));
+    for(String table:List.of("tapping_assignment","tapping_record","latex_collection","collection_revision","collection_command","drc_measurement","collection_adjustment","outbox_event")){
+      String checksum="SELECT coalesce(md5(string_agg(row_to_json(t)::text,'|' ORDER BY row_to_json(t)::text)),'empty') FROM "+table+" t";
+      assertEquals(runtime.queryForObject(checksum,String.class),restored.queryForObject(checksum,String.class),table);
+    }
+    assertTrue(restored.queryForObject("SELECT count(*) FROM collection_revision",Long.class)>0);
+  }
+
+  @Test @Order(4) void previous3aImageRunsWithRestrictedLoginAgainstV3WithoutDeletingEvidence()throws Exception{
     Path directory=Files.createTempDirectory(Path.of("target"),"previous-3a-").toAbsolutePath().normalize();
     var archive=new ProcessBuilder("git","archive","--format=zip",PREVIOUS_3A,"Dockerfile",".dockerignore",".mvn","mvnw","pom.xml","src")
         .redirectError(ProcessBuilder.Redirect.DISCARD).start();
