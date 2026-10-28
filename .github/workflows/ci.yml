@@ -18,6 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements-dev.txt
+      - run: python scripts/test_contract_checkout.py
       - run: chmod +x mvnw
       - run: ./mvnw --batch-mode --no-transfer-progress verify -Pintegration
       - run: python scripts/validate_collection_pins.py --snapshots target/collection-snapshots --events target/collection-events --api-responses target/collection-api

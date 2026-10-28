@@ -4,3 +4,7 @@
 *.jpg binary
 *.uasset binary
 *.umap binary
+
+# Reviewed release artifacts are byte-pinned; preserve their approved line endings.
+src/main/resources/contracts/operations-service.yaml -text whitespace=cr-at-eol
+src/main/resources/contracts/events/operations/v2/*.schema.json -text whitespace=cr-at-eol

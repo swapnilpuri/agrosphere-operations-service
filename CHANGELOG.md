@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased - 2026-10-28 CI artifact preservation
+
+Preserve exact owner-approved Contracts 0.5.0 artifact bytes in Git rather than normalizing their CRLF line endings. Add an isolated Git clean/checkout regression for both autocrlf settings before integration CI. Existing hashes, contract semantics and strict integrity checks are unchanged.
+
 ## Unreleased - 2026-10-27 local Milestone 3B
 
 Collection command/API/query/v2 outbox implementation with durable replay, scoped exact-decimal summaries, separate runtime/Flyway credentials, generated-only integration/backup/prior-image drills and strict 27-operation validation. Existing tapping semantics and v1 event bytes retained. Local implementation only; no deployment or remote publication.
