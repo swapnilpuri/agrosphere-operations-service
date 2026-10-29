@@ -21,3 +21,7 @@ Local contract release 0.5.0 and Operations artifact pinning were explicitly acc
 ## Scoped credential-wiring authorization - 2026-10-27
 
 The owner authorizes the reviewed Operations-only runtime/Flyway wiring, tracked placeholders and provisioning-tool implementation, and generated credentials only in disposable tests. This supplements earlier secret-handling exclusions only for that scope. Do not read/modify existing private environment files, provision existing/running stacks, or change production/AEO state. See Architecture docs/milestones/MILESTONE_3B_CREDENTIAL_WIRING_APPROVAL.json and continue authorized T03-T09 in dependency order.
+
+## Owner-approved WA-1 — 2026-10-29
+
+The owner accepted D01–D10 and authorized WA-T01–T09 in dependency order; see Architecture docs/milestones/WORKER_ATTENDANCE_APPROVAL.md and ADR 0014. Pure workforce domain/ports are authorized independently of executable contract release. Keep new registration UUIDs distinct from existing workerId/sub and preserve tapping/collection contracts/history. Persistence follows stable reviewed schemas; HTTP/events/Web pinning follow independent accepted Contracts release. No REAL mutations before implemented D09 privacy gate; no workload acceptance without D08 inputs. Existing-stack/private-environment/production/AEO and Git exclusions persist.

@@ -1,5 +1,7 @@
 # AgroSphere Operations Service â€” 0.2.0
 
+WA-1 progress (2026-10-29): owner-approved worker/attendance pure domain and application ports are under `workforce/`, with 24 rule/fixed-clock tests and an unconditional SIMULATED-only mutation guard pending D09 privacy enablement. No new runtime route, migration, adapter or producer is wired. See [persistence preparation](docs/WORKFORCE_PERSISTENCE_PREPARATION.md). Executable Contracts candidate acceptance/local release is the next pinning gate; current 0.5.0 pins and tapping/collection attribution are unchanged.
+
 Milestone 3A implements rubber tapping schedules, dated assignments, execution/missed records and live productivity. This is an independent Java 25 / Spring Boot 4.0.9 / PostgreSQL service. Milestone 3B collection/DRC domain, persistence and security components are under construction; no collection HTTP API is enabled yet. Forecasting and an analytics warehouse remain excluded.
 
 ## Build and verify

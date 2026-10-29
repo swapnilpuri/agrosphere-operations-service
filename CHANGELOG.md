@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — 2026-10-29 WA-1
+
+Added WA-1 immutable registration/active-period/attendance domain, positive workforce permissions, SIMULATED-only mutation guard and application ports with 24 fixed-clock/rule tests. Added persistence preparation only; no new migration, adapter, endpoint, event producer or runtime wiring. Existing 3A/3B behavior/pins retained.
+
 ## Unreleased - 2026-10-28 CI artifact preservation
 
 Preserve exact owner-approved Contracts 0.5.0 artifact bytes in Git rather than normalizing their CRLF line endings. Add an isolated Git clean/checkout regression for both autocrlf settings before integration CI. Existing hashes, contract semantics and strict integrity checks are unchanged.
