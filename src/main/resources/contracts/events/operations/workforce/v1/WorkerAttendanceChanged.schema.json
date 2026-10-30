@@ -1,0 +1,177 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "WorkerAttendanceChanged"
+    },
+    "eventVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+    },
+    "source": {
+      "type": "string",
+      "const": "agrosphere-operations-service"
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "estateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dataProvenance": {
+      "type": "string",
+      "enum": [
+        "REAL",
+        "SIMULATED"
+      ]
+    },
+    "aggregateId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "aggregateVersion": {
+      "type": "integer",
+      "format": "int64",
+      "minimum": 1,
+      "maximum": 9223372036854775807
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "attendanceId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "estateId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "dataProvenance": {
+              "type": "string",
+              "enum": [
+                "REAL",
+                "SIMULATED"
+              ]
+            },
+            "version": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            },
+            "workerRegistrationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "attendanceDate": {
+              "type": "string",
+              "format": "date"
+            },
+            "estateTimezone": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            "divisionIdSnapshot": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "activePeriodId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "workerVersionSnapshot": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "PRESENT",
+                "ABSENT",
+                "EXCUSED",
+                "VOIDED"
+              ]
+            }
+          },
+          "required": [
+            "attendanceId",
+            "estateId",
+            "dataProvenance",
+            "version",
+            "workerRegistrationId",
+            "attendanceDate",
+            "estateTimezone",
+            "divisionIdSnapshot",
+            "activePeriodId",
+            "workerVersionSnapshot",
+            "status"
+          ]
+        },
+        "previousVersion": {
+          "type": "integer",
+          "format": "int64",
+          "minimum": 0,
+          "maximum": 9223372036854775807
+        },
+        "changeKind": {
+          "type": "string",
+          "enum": [
+            "CORRECT",
+            "VOID",
+            "RERECORD"
+          ]
+        }
+      },
+      "required": [
+        "snapshot",
+        "previousVersion",
+        "changeKind"
+      ]
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "timestamp",
+    "source",
+    "correlationId",
+    "estateId",
+    "dataProvenance",
+    "aggregateId",
+    "aggregateVersion",
+    "payload"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agrosphere.invalid/operations/workforce/v1/WorkerAttendanceChanged.schema.json",
+  "title": "WorkerAttendanceChanged"
+}

@@ -9,9 +9,17 @@ ROOT = Path(__file__).resolve().parents[1] / "src/main/resources/contracts"
 manifest = json.loads((ROOT / "COLLECTION_RELEASE.json").read_text(encoding="utf-8"))
 assert manifest["release"] == "0.5.0"
 for name, expected in manifest["files"].items():
-    assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest() == expected, name
+    path=ROOT/name
+    if name=='operations-service.yaml' and (ROOT/'WORKFORCE_RELEASE.json').exists():path=ROOT/'previous-0.5.0/operations-service.yaml'
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, name
 api = json.loads((ROOT/"operations-service.yaml").read_text(encoding="utf-8"))
-assert sum(len(methods) for methods in api["paths"].values()) == 27
+assert sum(len(methods) for methods in api["paths"].values()) == (42 if (ROOT/'WORKFORCE_RELEASE.json').exists() else 27)
+if (ROOT/'WORKFORCE_RELEASE.json').exists():
+    workforce=json.loads((ROOT/'WORKFORCE_RELEASE.json').read_text())
+    assert workforce['release']=='0.6.0'
+    for name,expected in workforce['files'].items():assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==expected,name
+    old=json.loads((ROOT/'previous-0.5.0/operations-service.yaml').read_text())
+    for path,body in old['paths'].items():assert api['paths'][path]==body,path
 for name in (ROOT/"events/operations/v2").glob("*.json"):
     schema = json.loads(name.read_text(encoding="utf-8"))
     assert schema["properties"]["eventVersion"]["const"] == 2

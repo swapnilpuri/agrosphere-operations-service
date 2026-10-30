@@ -88,7 +88,7 @@ class CollectionSchemaIT {
   }
 
   @Test void freshV3AndRestrictedRoleGrants() throws Exception {
-    assertEquals("3",db.queryForObject("SELECT max(version) FROM flyway_schema_history",String.class));
+    assertEquals("4",db.queryForObject("SELECT max(version) FROM flyway_schema_history",String.class));
     try (var connection=source.getConnection();var statement=connection.createStatement()) {
       statement.execute("SET ROLE agrosphere_operations_app");
       try(var r=statement.executeQuery("SELECT has_table_privilege(current_user,'collection_revision','INSERT'),has_table_privilege(current_user,'collection_revision','UPDATE'),has_table_privilege(current_user,'collection_revision','DELETE'),has_schema_privilege(current_user,current_schema(),'CREATE')")) {

@@ -8,12 +8,31 @@ import java.util.*;
 /** WA-1 application boundaries. No adapter/controller/bean or runtime route is registered. */
 public final class WorkforcePorts {
   private WorkforcePorts() {}
+  public interface Identity { Actor current(); }
 
   public interface References {
+    /** Current canonical timezone for history/period dates, including inactive estates. */
+    EstateContext estate(UUID estateId);
     /** Authenticated, bounded, fail-closed active Estate validation; no copied database. */
     EstateContext activeEstate(UUID estateId);
     /** Return the canonical active division iff it belongs to this estate. */
     UUID activeDivision(UUID estateId, UUID divisionId);
+  }
+
+  public record WorkerFilter(UUID estateId, java.time.LocalDate activeOn, String code, String namePrefix,
+      UUID divisionId, Provenance provenance, int page, int size) {}
+  public record DayFilter(UUID estateId, java.time.LocalDate from, java.time.LocalDate to,
+      UUID workerRegistrationId, AttendanceStatus status, Provenance provenance, int page, int size) {}
+  public record RosterRow(WorkerRegistration worker, AttendanceDay attendance) {}
+  public interface Queries {
+    List<WorkerRegistration> workers(WorkerFilter filter, ReadScope scope);
+    long workerCount(WorkerFilter filter, ReadScope scope);
+    List<AttendanceDay> days(DayFilter filter, ReadScope scope);
+    long dayCount(DayFilter filter, ReadScope scope);
+    List<RosterRow> roster(UUID estateId, java.time.LocalDate date, UUID division, Provenance provenance, int page, int size, ReadScope scope);
+    Map<String,Long> coverage(UUID estateId, java.time.LocalDate date, UUID division, Provenance provenance, ReadScope scope);
+    List<Revision<?>> history(UUID id, boolean worker, ReadScope scope, int page, int size);
+    long historyCount(UUID id, boolean worker, ReadScope scope);
   }
 
   public interface Ownership {
@@ -29,19 +48,19 @@ public final class WorkforcePorts {
 
   public interface Registrations {
     /** Resolve minimal ownership before protected data; authorization precedes this full read. */
-    WorkerRegistration get(UUID id, ReadScope scope);
-    WorkerRegistration lock(UUID id, ReadScope scope);
+    WorkerRegistration getWorker(UUID id, ReadScope scope);
+    WorkerRegistration lockWorker(UUID id, ReadScope scope);
     /** Must run under the same root lock as attendance mutation or period closure. */
     Set<LocalDate> nonvoidedAttendanceDates(UUID workerRegistrationId, ReadScope scope);
-    void insert(WorkerRegistration registration);
-    void update(WorkerRegistration registration, long expectedVersion);
+    void insertWorker(WorkerRegistration registration);
+    void updateWorker(WorkerRegistration registration, long expectedVersion);
   }
 
   public interface Attendance {
-    AttendanceDay get(UUID id, ReadScope scope);
+    AttendanceDay getDay(UUID id, ReadScope scope);
     Optional<AttendanceDay> findDay(UUID workerRegistrationId, LocalDate date, ReadScope scope);
-    void insert(AttendanceDay day);
-    void update(AttendanceDay day, long expectedVersion);
+    void insertDay(AttendanceDay day);
+    void updateDay(AttendanceDay day, long expectedVersion);
   }
 
   public enum CommandKind { REGISTER, PROFILE, PERIOD_CLOSED, PERIOD_OPENED, RECORD, CORRECT, VOID, RERECORD }
@@ -55,6 +74,10 @@ public final class WorkforcePorts {
       recordedBy = WorkforceRules.subject(recordedBy);
       WorkforceRules.require(aggregateId.equals(snapshot.id()) && version == snapshot.audit().version() &&
           recordedAt.equals(snapshot.audit().updatedAt()) && recordedBy.equals(snapshot.audit().updatedBy()), "Revision/snapshot mismatch");
+      boolean initial=commandKind==CommandKind.REGISTER||commandKind==CommandKind.RECORD;
+      WorkforceRules.require(initial?version==0:version>0,"Command kind/revision mismatch");
+      boolean workerKind=Set.of(CommandKind.REGISTER,CommandKind.PROFILE,CommandKind.PERIOD_CLOSED,CommandKind.PERIOD_OPENED).contains(commandKind);
+      WorkforceRules.require(workerKind==(snapshot instanceof WorkerRegistration),"Command kind/aggregate mismatch");
       if (commandKind != CommandKind.REGISTER && commandKind != CommandKind.RECORD) reason = WorkforceRules.reason(reason);
       else if (reason != null) reason = WorkforceRules.reason(reason);
     }

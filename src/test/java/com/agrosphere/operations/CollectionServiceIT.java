@@ -436,7 +436,7 @@ class CollectionServiceIT {
 
   @Test void runtimeDocumentsAllActualOperationsAndPinnedCollectionSchemas()throws Exception{
     var response=http("GET","/v3/api-docs",null,null,200);var api=json.readTree(response.body());
-    int operations=0;for(var path:api.path("paths")){operations+=path.size();}assertEquals(27,operations);
+    int operations=0;for(var path:api.path("paths")){operations+=path.size();}assertEquals(42,operations);
     Files.createDirectories(Path.of("target"));Files.writeString(Path.of("target/openapi-runtime.json"),response.body());
   }
 }

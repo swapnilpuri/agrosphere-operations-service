@@ -2,7 +2,7 @@
 
 ## Unreleased — 2026-10-29 WA-1
 
-Added WA-1 immutable registration/active-period/attendance domain, positive workforce permissions, SIMULATED-only mutation guard and application ports with 24 fixed-clock/rule tests. Added persistence preparation only; no new migration, adapter, endpoint, event producer or runtime wiring. Existing 3A/3B behavior/pins retained.
+Added WA-1 domain, additive V4 persistence/grants, durable receipts, fifteen scoped endpoints, bounded authenticated Estate references and four minimal v1 event families. Pin accepted Contracts 0.6.0 while preserving prior 0.5.0 hashes/legacy semantics. REAL mutations remain denied. Add signed-JWT/database/broker/runtime-contract/prior-image checks; see docs/WORKFORCE_IMPLEMENTATION.md. No deployment or publication.
 
 ## Unreleased - 2026-10-28 CI artifact preservation
 

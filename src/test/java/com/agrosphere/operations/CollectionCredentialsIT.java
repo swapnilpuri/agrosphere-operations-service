@@ -121,16 +121,41 @@ class CollectionCredentialsIT {
   }
 
   @Test @Order(4) void previous3aImageRunsWithRestrictedLoginAgainstV3WithoutDeletingEvidence()throws Exception{
+    previousImage(PREVIOUS_3A);
+  }
+
+  @Test @Order(5) void previous3bImageRunsAgainstV4AndRetainsWorkforceEvidence()throws Exception{
+    var store=context.getBean(com.agrosphere.operations.workforce.infrastructure.JdbcWorkforceStore.class);
+    var estate=UUID.randomUUID();var correlation=UUID.randomUUID();var now=Instant.parse("2026-10-29T12:00:00Z");
+    var command=new com.agrosphere.operations.workforce.domain.WorkforceRules.Command(
+      new com.agrosphere.operations.workforce.domain.WorkforceRules.Actor("SIMULATED-rollback",Set.of("PLATFORM_ADMIN"),Set.of()),Clock.fixed(now,ZoneOffset.UTC),correlation);
+    var master=new com.agrosphere.operations.workforce.domain.WorkforceRules.EstateContext(estate,ZoneId.of("Africa/Blantyre"));
+    var worker=com.agrosphere.operations.workforce.domain.WorkerRegistration.register(UUID.randomUUID(),UUID.randomUUID(),master,"SIM-ROLLBACK","SIMULATED retained worker",null,LocalDate.of(2026,10,29),com.agrosphere.operations.workforce.domain.WorkforceRules.Provenance.SIMULATED,command);
+    var day=com.agrosphere.operations.workforce.domain.AttendanceDay.record(UUID.randomUUID(),worker,LocalDate.of(2026,10,29),com.agrosphere.operations.workforce.domain.WorkforceRules.AttendanceStatus.PRESENT,master,null,command);
+    tx.executeWithoutResult(s->{
+      store.insertWorker(worker);store.append(new com.agrosphere.operations.workforce.application.WorkforcePorts.Revision<>(worker.id(),0,com.agrosphere.operations.workforce.application.WorkforcePorts.CommandKind.REGISTER,null,now,"SIMULATED-rollback",correlation,worker));
+      store.insertDay(day);store.append(new com.agrosphere.operations.workforce.application.WorkforcePorts.Revision<>(day.id(),0,com.agrosphere.operations.workforce.application.WorkforcePorts.CommandKind.RECORD,null,now,"SIMULATED-rollback",correlation,day));
+    });
+    previousImage("a808c199f87562cb3469f4d612e22e5f894ab660");
+    var scope=new com.agrosphere.operations.workforce.application.WorkforcePorts.ReadScope(Set.of(estate));
+    assertEquals(worker,store.getWorker(worker.id(),scope));assertEquals(day,store.getDay(day.id(),scope));
+    assertEquals(1,store.historyCount(worker.id(),true,scope));assertEquals(1,store.historyCount(day.id(),false,scope));
+    assertEquals("4",context.getBean(Flyway.class).info().current().getVersion().toString());
+  }
+
+  void previousImage(String revision)throws Exception{
     Path directory=Files.createTempDirectory(Path.of("target"),"previous-3a-").toAbsolutePath().normalize();
-    var archive=new ProcessBuilder("git","archive","--format=zip",PREVIOUS_3A,"Dockerfile",".dockerignore",".mvn","mvnw","pom.xml","src")
+    var archiveFile=directory.resolve("previous-image.zip");
+    var archive=new ProcessBuilder("git","archive","--format=zip","--output="+archiveFile,revision,"Dockerfile",".dockerignore",".mvn","mvnw","pom.xml","src")
         .redirectError(ProcessBuilder.Redirect.DISCARD).start();
-    try(var zip=new ZipInputStream(archive.getInputStream())){
+    assertEquals(0,archive.waitFor(),"Pinned previous commit must be available; CI checkout requires history");
+    try(var zip=new ZipInputStream(Files.newInputStream(archiveFile))){
       java.util.zip.ZipEntry entry;
       while((entry=zip.getNextEntry())!=null){var destination=directory.resolve(entry.getName()).normalize();
         assertTrue(destination.startsWith(directory),"Archive must stay in isolated build context");
         if(entry.isDirectory())Files.createDirectories(destination);else{Files.createDirectories(destination.getParent());Files.copy(zip,destination);}}
     }
-    assertEquals(0,archive.waitFor(),"Pinned previous 3A commit must be available; CI checkout requires history");
+    Files.delete(archiveFile);
     var before=runtime.queryForObject("SELECT count(*) FROM latex_collection",Long.class);
     assertTrue(before>0,"Retained collection evidence must exist before the rollback drill");
     var key=new RSAKeyGenerator(2048).keyID("rollback-proof").generate();

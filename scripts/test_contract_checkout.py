@@ -16,6 +16,9 @@ CONTRACTS = Path('src/main/resources/contracts')
 class ContractCheckoutTest(unittest.TestCase):
     def test_approved_bytes_survive_git_normalization_and_checkout(self):
         manifest = json.loads((ROOT / CONTRACTS / 'COLLECTION_RELEASE.json').read_text())
+        if (ROOT/CONTRACTS/'WORKFORCE_RELEASE.json').exists():
+            manifest['files']['previous-0.5.0/operations-service.yaml']=manifest['files'].pop('operations-service.yaml')
+            manifest['files'].update(json.loads((ROOT/CONTRACTS/'WORKFORCE_RELEASE.json').read_text())['files'])
         temporary_root = ROOT / 'target'
         temporary_root.mkdir(exist_ok=True)
         for autocrlf in ('false', 'true'):

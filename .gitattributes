@@ -8,3 +8,5 @@
 # Reviewed release artifacts are byte-pinned; preserve their approved line endings.
 src/main/resources/contracts/operations-service.yaml -text whitespace=cr-at-eol
 src/main/resources/contracts/events/operations/v2/*.schema.json -text whitespace=cr-at-eol
+src/main/resources/contracts/events/operations/workforce/v1/** -text whitespace=cr-at-eol
+src/main/resources/contracts/previous-0.5.0/** -text whitespace=cr-at-eol

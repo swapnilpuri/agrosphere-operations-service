@@ -1,0 +1,11 @@
+{
+  "release": "0.6.0",
+  "sourceManifestSha256": "a729a0edc37e558a9f31766ba6d32ba29320def882c09cc963b5eddddade0d94",
+  "files": {
+    "events/operations/workforce/v1/WorkerAttendanceChanged.schema.json": "2e1f57d724000aa0a4d2bd98f75324dc09410c73984dbfdd4495a3819c4f4881",
+    "events/operations/workforce/v1/WorkerAttendanceRecorded.schema.json": "3148c8c61ff06c07369da553bbf2c746fb12ce5685bed57e5d43e81a606484ac",
+    "events/operations/workforce/v1/WorkerRegistrationChanged.schema.json": "75e9ce73349642bb75d4cad17973f4717c62290df6adc30aa0188ab4ddfa9791",
+    "events/operations/workforce/v1/WorkerRegistrationCreated.schema.json": "34699424c3441a3b97e8d137724ddb42c26485aa62a43a182f0e121da570be67",
+    "operations-service.yaml": "ce0cbf3d16c90335e0bef2f379977f7e5942d501e8f26746fc3068f1c68a6310"
+  }
+}

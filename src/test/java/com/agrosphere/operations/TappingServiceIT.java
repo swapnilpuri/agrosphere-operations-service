@@ -195,7 +195,7 @@ class TappingServiceIT {
   @Order(1)
   void migrationsScheduleAndGeneration() throws Exception {
     assertEquals(
-        3,
+        4,
         jdbc.queryForObject(
             "select count(*) from flyway_schema_history where success and version is not null", Integer.class));
     assertEquals(2, jdbc.queryForObject(

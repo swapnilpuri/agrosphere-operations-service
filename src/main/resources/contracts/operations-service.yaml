@@ -3196,6 +3196,2186 @@
           "unknownFilters": "reject"
         }
       }
+    },
+    "/api/v1/workers": {
+      "post": {
+        "operationId": "registerWorker",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "/api/v1/workers/{id}; retained on replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerRegister"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listWorkers",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "provenance",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REAL",
+                "SIMULATED"
+              ]
+            }
+          },
+          {
+            "name": "activeOn",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z0-9][A-Z0-9_-]{0,63}$"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            }
+          },
+          {
+            "name": "divisionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/FIELD_SUPERVISOR/AUDITOR. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "READ",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        }
+      }
+    },
+    "/api/v1/workers/{id}": {
+      "get": {
+        "operationId": "getWorker",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/FIELD_SUPERVISOR/AUDITOR. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "READ",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        }
+      },
+      "patch": {
+        "operationId": "updateWorker",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerUpdate"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workers/{id}/close-period": {
+      "post": {
+        "operationId": "closeWorkerPeriod",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerClosePeriod"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workers/{id}/open-period": {
+      "post": {
+        "operationId": "openWorkerPeriod",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkerOpenPeriod"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workers/{id}/history": {
+      "get": {
+        "operationId": "getWorkerHistory",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkerHistoryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/AUDITOR; includes protected reasons/actors. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "HISTORY",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        }
+      }
+    },
+    "/api/v1/attendance/roster": {
+      "get": {
+        "operationId": "getAttendanceRoster",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "provenance",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REAL",
+                "SIMULATED"
+              ]
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "divisionId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRosterPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/FIELD_SUPERVISOR/AUDITOR. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "READ",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        }
+      }
+    },
+    "/api/v1/attendance/days": {
+      "post": {
+        "operationId": "recordAttendanceDay",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "/api/v1/attendance/days/{id}; retained on replay"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; scoped FIELD_SUPERVISOR today only. Past dates require manager and backdateReason. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "RECORD",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceRecord"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listAttendanceDays",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "estateId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "provenance",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REAL",
+                "SIMULATED"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "workerRegistrationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PRESENT",
+                "ABSENT",
+                "EXCUSED",
+                "VOIDED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendancePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/FIELD_SUPERVISOR/AUDITOR. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "READ",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647,
+          "dateBounds": "both-required",
+          "maximumDateDifferenceDays": 366
+        }
+      }
+    },
+    "/api/v1/attendance/days/{id}": {
+      "get": {
+        "operationId": "getAttendanceDay",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/FIELD_SUPERVISOR/AUDITOR. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "READ",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        }
+      }
+    },
+    "/api/v1/attendance/days/{id}/corrections": {
+      "post": {
+        "operationId": "correctAttendanceDay",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceChange"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attendance/days/{id}/void": {
+      "post": {
+        "operationId": "voidAttendanceDay",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceVoid"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attendance/days/{id}/re-record": {
+      "post": {
+        "operationId": "rerecordAttendanceDay",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Original authorized command receipt",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER; reason required on noncreate. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "MANAGER",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceChange"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/attendance/days/{id}/history": {
+      "get": {
+        "operationId": "getAttendanceHistory",
+        "tags": [
+          "workforce"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized minimal resource/query",
+            "headers": {
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceHistoryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid syntax, fields, dates or state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid authentication",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Role/estate/backdate denied",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Authorized local resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version/uniqueness/period/key conflict or bounded lock timeout",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid/inactive/mismatched canonical master reference",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded dependency unavailable or malformed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          }
+        },
+        "description": "PLATFORM_ADMIN globally; scoped ESTATE_ADMIN/ESTATE_MANAGER/AUDITOR; includes protected reasons/actors. Signed sub and trusted estate_ids required except explicit platform global access. PLANTATION_ADMIN alone, VIEWER, FIELD_WORKER and AGRONOMIST denied. Positive operation permissions; scope before queries/counts/history/replay. Unknown fields/filters rejected. Ordinary views omit actors/reasons. Writes use durable actor/key normalized receipts; reauthorize before replay. Noncreate version is required; exact replay emits nothing. REAL workforce collection remains disabled until the separate D09 privacy/retention enablement gate is accepted and verified.",
+        "x-workforce-permission": "HISTORY",
+        "x-query-constraints": {
+          "unknownFilters": "reject",
+          "maximumOffset": 2147483647
+        }
+      }
     }
   },
   "components": {
@@ -4800,6 +6980,918 @@
           "size",
           "totalElements",
           "aggregationPolicy"
+        ]
+      },
+      "WorkforceActivePeriod": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activeFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "activeTo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "introducedVersion": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "closedVersion": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "format": "int64",
+                "minimum": 0,
+                "maximum": 9223372036854775807
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "activeFrom",
+          "activeTo",
+          "introducedVersion",
+          "closedVersion"
+        ]
+      },
+      "WorkerView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workerCode": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9_-]{0,63}$"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "divisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dataProvenance": {
+            "type": "string",
+            "enum": [
+              "REAL",
+              "SIMULATED"
+            ]
+          },
+          "activePeriods": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/WorkforceActivePeriod"
+            }
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+          }
+        },
+        "required": [
+          "id",
+          "estateId",
+          "workerCode",
+          "displayName",
+          "divisionId",
+          "dataProvenance",
+          "activePeriods",
+          "version",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AttendanceView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workerRegistrationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attendanceDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "estateTimezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "workerCodeSnapshot": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9_-]{0,63}$"
+          },
+          "divisionIdSnapshot": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workerVersionSnapshot": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "activePeriodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dataProvenance": {
+            "type": "string",
+            "enum": [
+              "REAL",
+              "SIMULATED"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PRESENT",
+              "ABSENT",
+              "EXCUSED",
+              "VOIDED"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+          }
+        },
+        "required": [
+          "id",
+          "estateId",
+          "workerRegistrationId",
+          "attendanceDate",
+          "estateTimezone",
+          "workerCodeSnapshot",
+          "divisionIdSnapshot",
+          "workerVersionSnapshot",
+          "activePeriodId",
+          "dataProvenance",
+          "status",
+          "version",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "WorkerRegister": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workerCode": {
+            "type": "string",
+            "pattern": "^ *[A-Za-z0-9][A-Za-z0-9_-]{0,63} *$",
+            "description": "Trim and uppercase ASCII before uniqueness and command hashing."
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "activeFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "dataProvenance": {
+            "type": "string",
+            "enum": [
+              "REAL",
+              "SIMULATED"
+            ]
+          },
+          "divisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "estateId",
+          "workerCode",
+          "displayName",
+          "activeFrom",
+          "dataProvenance"
+        ]
+      },
+      "WorkerUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+            "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "divisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "version",
+          "reason"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "displayName"
+            ]
+          },
+          {
+            "required": [
+              "divisionId"
+            ]
+          }
+        ]
+      },
+      "WorkerClosePeriod": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "activePeriodId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activeTo": {
+            "type": "string",
+            "format": "date"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+            "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+          }
+        },
+        "required": [
+          "version",
+          "activePeriodId",
+          "activeTo",
+          "reason"
+        ]
+      },
+      "WorkerOpenPeriod": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "activeFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+            "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+          }
+        },
+        "required": [
+          "version",
+          "activeFrom",
+          "reason"
+        ]
+      },
+      "AttendanceRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workerRegistrationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "attendanceDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PRESENT",
+              "ABSENT",
+              "EXCUSED"
+            ]
+          },
+          "backdateReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+            "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+          }
+        },
+        "required": [
+          "workerRegistrationId",
+          "attendanceDate",
+          "status"
+        ]
+      },
+      "AttendanceChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PRESENT",
+              "ABSENT",
+              "EXCUSED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+            "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+          }
+        },
+        "required": [
+          "version",
+          "status",
+          "reason"
+        ]
+      },
+      "AttendanceVoid": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+            "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+          }
+        },
+        "required": [
+          "version",
+          "reason"
+        ]
+      },
+      "WorkerRosterItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9][A-Z0-9_-]{0,63}$"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "divisionId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provenance": {
+            "type": "string",
+            "enum": [
+              "REAL",
+              "SIMULATED"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "displayName",
+          "divisionId",
+          "provenance",
+          "version"
+        ]
+      },
+      "WorkerHistoryEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "commandKind": {
+            "type": "string",
+            "enum": [
+              "REGISTER",
+              "PROFILE",
+              "PERIOD_CLOSED",
+              "PERIOD_OPENED"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000,
+                "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+                "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+          },
+          "recordedBy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/WorkerView"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "commandKind",
+          "reason",
+          "recordedAt",
+          "recordedBy",
+          "correlationId",
+          "snapshot"
+        ]
+      },
+      "WorkerPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements"
+        ]
+      },
+      "WorkerHistoryPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkerHistoryEntry"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements"
+        ]
+      },
+      "AttendanceHistoryEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "commandKind": {
+            "type": "string",
+            "enum": [
+              "RECORD",
+              "CORRECT",
+              "VOID",
+              "RERECORD"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000,
+                "pattern": "^[^\\u0000-\\u001F\\u007F-\\u009F]*\\S[^\\u0000-\\u001F\\u007F-\\u009F]*$",
+                "description": "Trim before validation/hash; nonblank, no control characters. Do not enter health or other sensitive personal details."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.[0-9]{1,6}0*)?Z$"
+          },
+          "recordedBy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AttendanceView"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "commandKind",
+          "reason",
+          "recordedAt",
+          "recordedBy",
+          "correlationId",
+          "snapshot"
+        ]
+      },
+      "AttendancePage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttendanceView"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements"
+        ]
+      },
+      "AttendanceHistoryPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttendanceHistoryEntry"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements"
+        ]
+      },
+      "AttendanceRosterPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "worker": {
+                  "$ref": "#/components/schemas/WorkerRosterItem"
+                },
+                "attendance": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AttendanceView"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "worker",
+                "attendance"
+              ]
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "estateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "estateTimezone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "\\S"
+          },
+          "dataProvenance": {
+            "type": "string",
+            "enum": [
+              "REAL",
+              "SIMULATED"
+            ]
+          },
+          "eligibleCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "markedCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "unmarkedCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "voidedCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "outsideRosterRecordedCount": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          }
+        },
+        "required": [
+          "content",
+          "page",
+          "size",
+          "totalElements",
+          "estateId",
+          "date",
+          "estateTimezone",
+          "dataProvenance",
+          "eligibleCount",
+          "markedCount",
+          "unmarkedCount",
+          "voidedCount",
+          "outsideRosterRecordedCount"
         ]
       }
     },
