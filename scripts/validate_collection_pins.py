@@ -13,11 +13,15 @@ for name, expected in manifest["files"].items():
     if name=='operations-service.yaml' and (ROOT/'WORKFORCE_RELEASE.json').exists():path=ROOT/'previous-0.5.0/operations-service.yaml'
     assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, name
 api = json.loads((ROOT/"operations-service.yaml").read_text(encoding="utf-8"))
-assert sum(len(methods) for methods in api["paths"].values()) == (42 if (ROOT/'WORKFORCE_RELEASE.json').exists() else 27)
+assert sum(len(methods) for methods in api["paths"].values()) == (70 if (ROOT/'PRIVACY_RELEASE.json').exists() else 64 if (ROOT/'ALERT_RELEASE.json').exists() else 58 if (ROOT/'CROP_HEALTH_RELEASE.json').exists() else 42 if (ROOT/'WORKFORCE_RELEASE.json').exists() else 27)
 if (ROOT/'WORKFORCE_RELEASE.json').exists():
     workforce=json.loads((ROOT/'WORKFORCE_RELEASE.json').read_text())
     assert workforce['release']=='0.6.0'
-    for name,expected in workforce['files'].items():assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==expected,name
+    for name,expected in workforce['files'].items():
+        path=ROOT/'previous-0.6.0/operations-service.yaml' if name=='operations-service.yaml' and (ROOT/'CROP_HEALTH_RELEASE.json').exists() else ROOT/name
+        assert hashlib.sha256(path.read_bytes()).hexdigest()==expected,name
+    if (ROOT/'CROP_HEALTH_RELEASE.json').exists():
+        for name,expected in json.loads((ROOT/'CROP_HEALTH_RELEASE.json').read_text())['files'].items():assert hashlib.sha256((ROOT/'previous-0.7.0/operations-service.yaml' if name=='operations-service.yaml' and (ROOT/'ALERT_RELEASE.json').exists() else ROOT/name).read_bytes()).hexdigest()==expected,name
     old=json.loads((ROOT/'previous-0.5.0/operations-service.yaml').read_text())
     for path,body in old['paths'].items():assert api['paths'][path]==body,path
 for name in (ROOT/"events/operations/v2").glob("*.json"):

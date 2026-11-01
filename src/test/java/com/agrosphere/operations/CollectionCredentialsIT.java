@@ -140,11 +140,62 @@ class CollectionCredentialsIT {
     var scope=new com.agrosphere.operations.workforce.application.WorkforcePorts.ReadScope(Set.of(estate));
     assertEquals(worker,store.getWorker(worker.id(),scope));assertEquals(day,store.getDay(day.id(),scope));
     assertEquals(1,store.historyCount(worker.id(),true,scope));assertEquals(1,store.historyCount(day.id(),false,scope));
-    assertEquals("4",context.getBean(Flyway.class).info().current().getVersion().toString());
+    assertEquals("7",context.getBean(Flyway.class).info().current().getVersion().toString());
+  }
+
+  @Test @Order(6) void previousWaImageRunsAgainstV5AndRetainsCropHealthEvidence()throws Exception{
+    var store=context.getBean(com.agrosphere.operations.crophealth.infrastructure.JdbcCropHealthStore.class);
+    var estate=UUID.randomUUID();var block=UUID.randomUUID();var now=Instant.parse("2026-10-31T12:00:00Z");
+    var command=new com.agrosphere.operations.crophealth.domain.CropHealthRules.Command(
+      new com.agrosphere.operations.crophealth.domain.CropHealthRules.Actor("SIMULATED-prior-wa",Set.of("PLATFORM_ADMIN"),Set.of()),Clock.fixed(now,ZoneOffset.UTC),UUID.randomUUID());
+    var ctx=new com.agrosphere.operations.crophealth.domain.CropHealthRules.Context(estate,block,ZoneId.of("Africa/Libreville"));
+    var report=new com.agrosphere.operations.crophealth.domain.CropHealthRules.Report(now.minusSeconds(60),com.agrosphere.operations.crophealth.domain.CropHealthRules.Category.TREE_DAMAGE,
+      com.agrosphere.operations.crophealth.domain.CropHealthRules.Severity.LOW,"SIMULATED rollback observation","SIMULATED retained evidence");
+    var changes=com.agrosphere.operations.crophealth.application.CropHealthChanges.record(UUID.randomUUID(),UUID.randomUUID(),ctx,
+      com.agrosphere.operations.crophealth.domain.CropHealthRules.Provenance.SIMULATED,
+      new com.agrosphere.operations.crophealth.domain.CropHealthRules.Observation(report.observedAt(),com.agrosphere.operations.crophealth.domain.CropHealthRules.Outcome.FOLLOW_UP,"SIMULATED finding"),report,null,command);
+    tx.executeWithoutResult(s->{changes.revisions().forEach(r->store.insert(r.snapshot()));changes.revisions().forEach(store::appendRevision);});
+    previousImage("bf66e6136d60e436d8b034f9a6df3573da1248ed");
+    var scope=new com.agrosphere.operations.crophealth.application.CropHealthPorts.ReadScope(estate);
+    assertEquals(changes.inspection(),store.inspection(changes.inspection().id(),scope));
+    assertEquals(changes.incident(),store.incident(changes.incident().id(),scope));
+    assertEquals(1,store.history(changes.incident().id(),false,scope,0,25).totalElements());
+    assertEquals("7",context.getBean(Flyway.class).info().current().getVersion().toString());
+  }
+
+  @Test @Order(7) void previousIiImageRetainsPopulatedAlertReadAckEvidence()throws Exception{
+    var crop=context.getBean(com.agrosphere.operations.crophealth.infrastructure.JdbcCropHealthStore.class);
+    var alerts=context.getBean(com.agrosphere.operations.alerts.infrastructure.JdbcAlertStore.class);
+    var estate=UUID.randomUUID();var now=Instant.parse("2026-10-31T12:00:00Z");var tx=new TransactionTemplate(context.getBean(PlatformTransactionManager.class));
+    var command=new com.agrosphere.operations.crophealth.domain.CropHealthRules.Command(new com.agrosphere.operations.crophealth.domain.CropHealthRules.Actor("SIMULATED-rollback",Set.of("PLATFORM_ADMIN"),Set.of()),Clock.fixed(now,ZoneOffset.UTC),UUID.randomUUID());
+    var source=com.agrosphere.operations.crophealth.application.CropHealthChanges.directReport(UUID.randomUUID(),new com.agrosphere.operations.crophealth.domain.CropHealthRules.Context(estate,UUID.randomUUID(),ZoneId.of("Etc/UTC")),com.agrosphere.operations.crophealth.domain.CropHealthRules.Provenance.SIMULATED,
+        new com.agrosphere.operations.crophealth.domain.CropHealthRules.Report(now.minusSeconds(60),com.agrosphere.operations.crophealth.domain.CropHealthRules.Category.TREE_DAMAGE,com.agrosphere.operations.crophealth.domain.CropHealthRules.Severity.HIGH,"SIMULATED","SIMULATED"),null,command);
+    tx.executeWithoutResult(t->{crop.insert(source.incident());source.revisions().forEach(crop::appendRevision);
+      var created=com.agrosphere.operations.alerts.domain.CropHealthAlert.evaluate(UUID.randomUUID(),null,null,com.agrosphere.operations.alerts.infrastructure.AlertState.source(source.incident()),now,UUID.randomUUID());
+      alerts.save(created.alert(),null,created.transition());
+      var actor=new com.agrosphere.operations.alerts.domain.AlertRules.Actor(new com.agrosphere.operations.alerts.domain.AlertRules.Identity("https://generated.example.invalid","generated-rollback"),Set.of("PLATFORM_ADMIN"),Set.of());
+      var ack=created.alert().acknowledge(actor,1,1,null,now,UUID.randomUUID());alerts.save(ack.alert(),created.alert(),ack.transition());alerts.saveRead(ack.ownRead());
+    });
+    String before=runtime.queryForObject("SELECT md5(string_agg(snapshot::text,'' ORDER BY id)) FROM crop_health_alert",String.class);
+    previousImage("FIXTURE-II1");
+    assertEquals(before,runtime.queryForObject("SELECT md5(string_agg(snapshot::text,'' ORDER BY id)) FROM crop_health_alert",String.class));
+    assertEquals(1L,runtime.queryForObject("SELECT count(*) FROM alert_read",Long.class));assertEquals(1L,runtime.queryForObject("SELECT count(*) FROM alert_acknowledgement",Long.class));
   }
 
   void previousImage(String revision)throws Exception{
     Path directory=Files.createTempDirectory(Path.of("target"),"previous-3a-").toAbsolutePath().normalize();
+    if(revision.equals("FIXTURE-II1")) {
+      // Durable public source manifest, independent of a later owner commit/index.
+      var manifest=new tools.jackson.databind.ObjectMapper().readTree(Files.readString(Path.of("docs/alerts-notifications/prior-ii1-manifest.json")));
+      for(var file:manifest.required("files").properties()) {
+        var spec=file.getValue();var source=Path.of(spec.required("source").asText()).toAbsolutePath().normalize();assertTrue(source.startsWith(Path.of("").toAbsolutePath().normalize()));
+        byte[] bytes=Files.readAllBytes(source);
+        assertEquals(spec.required("sha256").asText(),HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes)));
+        var destination=directory.resolve(file.getKey()).normalize();assertTrue(destination.startsWith(directory));Files.createDirectories(destination.getParent());Files.write(destination,bytes);
+      }
+      assertTrue(Files.exists(directory.resolve("src/main/resources/db/migration/V5__inspections_and_crop_health.sql")));
+      assertFalse(Files.exists(directory.resolve("src/main/resources/db/migration/V6__in_app_crop_health_alerts.sql")));
+    }else {
     var archiveFile=directory.resolve("previous-image.zip");
     var archive=new ProcessBuilder("git","archive","--format=zip","--output="+archiveFile,revision,"Dockerfile",".dockerignore",".mvn","mvnw","pom.xml","src")
         .redirectError(ProcessBuilder.Redirect.DISCARD).start();
@@ -156,6 +207,7 @@ class CollectionCredentialsIT {
         if(entry.isDirectory())Files.createDirectories(destination);else{Files.createDirectories(destination.getParent());Files.copy(zip,destination);}}
     }
     Files.delete(archiveFile);
+    }
     var before=runtime.queryForObject("SELECT count(*) FROM latex_collection",Long.class);
     assertTrue(before>0,"Retained collection evidence must exist before the rollback drill");
     var key=new RSAKeyGenerator(2048).keyID("rollback-proof").generate();

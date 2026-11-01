@@ -27,4 +27,8 @@ jobs:
       - run: python scripts/validate_contracts.py
       - run: python scripts/validate_workforce_runtime.py
       - run: python scripts/test_workforce_projection.py
+      - run: python scripts/validate_alert_runtime.py
+      - run: python scripts/validate_alert_privacy_runtime.py
+      - run: python scripts/validate_crop_health_runtime.py
+      - run: python scripts/test_crop_health_projection.py
       - run: docker build -t agrosphere-operations-service:ci .

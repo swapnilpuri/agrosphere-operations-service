@@ -10,7 +10,8 @@ PINS=ROOT/'src/main/resources/contracts'
 manifest=json.loads((PINS/'WORKFORCE_RELEASE.json').read_text())
 assert manifest['release']=='0.6.0'
 for name,expected in manifest['files'].items():
-    assert hashlib.sha256((PINS/name).read_bytes()).hexdigest()==expected,name
+    path=PINS/'previous-0.6.0/operations-service.yaml' if name=='operations-service.yaml' and (PINS/'CROP_HEALTH_RELEASE.json').exists() else PINS/name
+    assert hashlib.sha256(path.read_bytes()).hexdigest()==expected,name
 api=json.loads((PINS/'operations-service.yaml').read_text())
 runtime=json.loads((ROOT/'target/openapi-runtime.json').read_text())
 methods={'get','post','patch'}
@@ -39,4 +40,4 @@ for path in (ROOT/'target/workforce-events').glob('*.json'):
         if name=='WorkerAttendanceChanged':assert (event['payload']['changeKind']=='VOID')==(s['status']=='VOIDED')
     count+=1
 assert seen=={'WorkerRegistrationCreated','WorkerRegistrationChanged','WorkerAttendanceRecorded','WorkerAttendanceChanged'},seen
-print(f'PASS: 42 actual REST operations aligned, six closed actual HTTP shapes, {count} real workforce envelopes/all four families and exact accepted 0.6.0 pins')
+print(f'PASS: Actual REST operation set aligned, six closed actual HTTP shapes, {count} real workforce envelopes/all four families and exact accepted 0.6.0 pins')

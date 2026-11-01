@@ -1,0 +1,11 @@
+{
+  "release": "0.7.0",
+  "sourceManifestSha256": "e04a8b289682dcfe1e6b38f490cb867ca67fd7db7717348f40a30758be9307bd",
+  "files": {
+    "events/operations/crop-health/v1/CropHealthIncidentChanged.schema.json": "c1b8f700a64d4477ea1d25b27f1463a8082a83af5619dbf68c2efcfe3eeaade7",
+    "events/operations/crop-health/v1/CropHealthIncidentReported.schema.json": "57339d13e770fd4e54873ba2e19e31d6b91aba239042df2b604e3cd4311f26c3",
+    "events/operations/crop-health/v1/FieldInspectionChanged.schema.json": "4276a0cead25cb490f4e21943056751929b3d3348cfa9c643140260b9f0798dd",
+    "events/operations/crop-health/v1/FieldInspectionRecorded.schema.json": "38ce1639ef2437238c256e26df5563dfd2b8549aaa639b60f39382007bc03c2c",
+    "operations-service.yaml": "d93d54a038edfa9e9cdaeb6f089015571ae399855169b1fba4e26388215c8c67"
+  }
+}

@@ -6,7 +6,7 @@ from contract_comparison import resolve
 from jsonschema import Draft202012Validator,FormatChecker
 from openapi_spec_validator import validate
 root=Path(__file__).resolve().parents[1]
-api=yaml.safe_load((root/'src/main/resources/contracts/operations-service.yaml').read_text())
+api=json.loads((root/'src/main/resources/contracts/operations-service.yaml').read_text())
 validate(api)
 runtime=json.loads((root/'target/openapi-runtime.json').read_text())
 expected={(p,m) for p,methods in api['paths'].items() for m in methods if m in ('get','post','patch')}

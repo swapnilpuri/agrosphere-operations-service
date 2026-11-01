@@ -19,6 +19,15 @@ class ContractCheckoutTest(unittest.TestCase):
         if (ROOT/CONTRACTS/'WORKFORCE_RELEASE.json').exists():
             manifest['files']['previous-0.5.0/operations-service.yaml']=manifest['files'].pop('operations-service.yaml')
             manifest['files'].update(json.loads((ROOT/CONTRACTS/'WORKFORCE_RELEASE.json').read_text())['files'])
+        if (ROOT/CONTRACTS/'CROP_HEALTH_RELEASE.json').exists():
+            manifest['files']['previous-0.6.0/operations-service.yaml']=manifest['files'].pop('operations-service.yaml')
+            manifest['files'].update(json.loads((ROOT/CONTRACTS/'CROP_HEALTH_RELEASE.json').read_text())['files'])
+        if (ROOT/CONTRACTS/'ALERT_RELEASE.json').exists():
+            manifest['files']['previous-0.7.0/operations-service.yaml']=manifest['files'].pop('operations-service.yaml')
+            manifest['files'].update(json.loads((ROOT/CONTRACTS/'ALERT_RELEASE.json').read_text())['files'])
+        if (ROOT/CONTRACTS/'PRIVACY_RELEASE.json').exists():
+            manifest['files']['previous-0.8.0/operations-service.yaml']=manifest['files'].pop('operations-service.yaml')
+            manifest['files'].update(json.loads((ROOT/CONTRACTS/'PRIVACY_RELEASE.json').read_text())['files'])
         temporary_root = ROOT / 'target'
         temporary_root.mkdir(exist_ok=True)
         for autocrlf in ('false', 'true'):

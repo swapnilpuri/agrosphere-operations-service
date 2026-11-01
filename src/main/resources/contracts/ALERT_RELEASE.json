@@ -1,0 +1,7 @@
+{
+  "release": "0.8.0",
+  "sourceManifestSha256": "d96a5885a60e4e16e2b6e196806d26c8e50a8b58d0243d06a8a6651962b3274c",
+  "files": {
+    "operations-service.yaml": "12daf94f17e8b4fded507c1f9a27a72deb7244c9a8b20013df131e748213e937"
+  }
+}

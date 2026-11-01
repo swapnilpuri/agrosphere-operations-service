@@ -1,0 +1,104 @@
+package com.agrosphere.operations.crophealth.application;
+
+import static com.agrosphere.operations.crophealth.domain.CropHealthRules.*;
+import static com.agrosphere.operations.crophealth.infrastructure.CropHealthState.*;
+import com.agrosphere.operations.crophealth.domain.*;
+import com.agrosphere.operations.crophealth.application.CropHealthPorts.*;
+import com.agrosphere.operations.crophealth.infrastructure.*;
+import java.time.*;
+import java.util.*;
+import org.springframework.stereotype.Service;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+@Service
+public class CropHealthService {
+  private final Identity identity;private final References references;private final JdbcCropHealthStore store;private final CropHealthTransactions transactions;
+  private final Clock clock;
+  @org.springframework.beans.factory.annotation.Autowired
+  public CropHealthService(Identity identity,References references,JdbcCropHealthStore store,CropHealthTransactions transactions) {
+    this(identity,references,store,transactions,Clock.systemUTC());
+  }
+  public CropHealthService(Identity identity,References references,JdbcCropHealthStore store,CropHealthTransactions transactions,Clock clock) {
+    this.identity=identity;this.references=references;this.store=store;this.transactions=transactions;this.clock=clock;
+  }
+  private static ResponseStatusException missing(){return new ResponseStatusException(HttpStatus.NOT_FOUND,"Crop evidence not found");}
+  private void feature(Actor actor,boolean manager,boolean history,boolean create) {
+    var allowed=new HashSet<>(Set.of("PLATFORM_ADMIN","ESTATE_ADMIN","ESTATE_MANAGER"));
+    if(!manager){if(!history)allowed.add("FIELD_SUPERVISOR");if(!create)allowed.add("AUDITOR");}
+    if(Collections.disjoint(actor.roles(),allowed))throw new Denied("Crop evidence operation denied");
+  }
+  private UUID estate(Actor actor,UUID id,boolean inspection) {
+    UUID estate;try{estate=inspection?store.inspectionEstate(id):store.incidentEstate(id);}catch(EmptyResultDataAccessException e){throw missing();}
+    if(!actor.scoped(estate))throw missing();return estate;
+  }
+  private Command command(Actor actor){String raw=org.slf4j.MDC.get("correlationId");return new Command(actor,clock,raw==null?UUID.randomUUID():CropHealthInput.uuid(raw));}
+  private CropIncident linked(FieldInspection root,ReadScope scope){return root.linkedIncidentId()==null?null:store.incident(root.linkedIncidentId(),scope);}
+  private Map<String,Object> paired(CropHealthChanges.ChangeSet change) {
+    return fields("inspection",inspectionView(change.inspection(),change.incident()),"incident",change.incident()==null?null:view(change.incident()));
+  }
+  private void save(CropHealthChanges.ChangeSet change) {
+    for(var revision:change.revisions()) {var root=revision.snapshot();if(root.audit().version()==0)store.insert(root);else store.update(root,root.audit().version()-1);}
+    for(var revision:change.revisions())store.appendRevision(revision);
+  }
+  private Receipt receipt(Actor actor,UUID key,String path,String hash,int status,Object body,String location) {
+    return new Receipt(actor.subject(),key,"POST",path,hash,1,status,stringify(body),location);
+  }
+  public Receipt create(boolean inspection,String body,String keyHeader) {
+    var actor=identity.current();feature(actor,false,false,true);var input=CropHealthInput.read(inspection?"InspectionRecord":"IncidentReport",body);
+    UUID estate=input.id("estateId");actor.read(estate);UUID key=CropHealthInput.uuid(keyHeader);String path="/api/v1/"+(inspection?"inspections":"incidents"),hash=input.hash(path);
+    return transactions.execute(actor.subject(),key,path,hash,actor.manager(estate)?"MANAGER":"SUPERVISOR",()->{
+      var context=references.activeBlock(estate,input.id("blockId"));var c=command(actor);
+      var change=inspection?CropHealthChanges.record(UUID.randomUUID(),input.outcome()==Outcome.FOLLOW_UP?UUID.randomUUID():null,context,Provenance.SIMULATED,
+          input.observation(),input.initialReport(),input.string("backdateReason"),c):CropHealthChanges.directReport(UUID.randomUUID(),context,Provenance.SIMULATED,input.report(),input.string("backdateReason"),c);
+      save(change);UUID id=inspection?change.inspection().id():change.incident().id();
+      return receipt(actor,key,path,hash,201,inspection?paired(change):view(change.incident()),path+"/"+id);
+    });
+  }
+  public Receipt change(boolean inspection,UUID id,String action,String body,String keyHeader) {
+    var actor=identity.current();feature(actor,true,false,false);UUID estate=estate(actor,id,inspection);actor.manage(estate);var scope=new ReadScope(estate);
+    String shape=inspection?(action.equals("corrections")?"InspectionCorrect":"InspectionVoid"):
+        (action.equals("corrections")||action.equals("amendments")?"IncidentEdit":action.equals("resolve")?"IncidentResolve":"IncidentAction");
+    var input=CropHealthInput.read(shape,body);UUID key=CropHealthInput.uuid(keyHeader);String path="/api/v1/"+(inspection?"inspections":"incidents")+"/"+id+"/"+action,hash=input.hash(path);
+    return transactions.execute(actor.subject(),key,path,hash,actor.manager(estate)?"MANAGER":"SUPERVISOR",()->{
+      var c=command(actor);String reason=input.string("reason");CropHealthChanges.ChangeSet change;
+      if(inspection) {
+        var root=store.lockInspection(id,scope);var linked=root.linkedIncidentId()==null?null:store.lockIncident(root.linkedIncidentId(),scope);
+        if(action.equals("corrections")) {
+          boolean create=input.outcome()==Outcome.FOLLOW_UP&&root.linkedIncidentId()==null;
+          if(create) {var canonical=references.activeBlock(estate,root.attribution().blockId());require(canonical.timezone().equals(root.attribution().estateTimezone()),"Canonical timezone changed; explicit context review required");}
+          change=CropHealthChanges.correctInspection(root,linked,input.version("inspectionVersion"),input.optionalVersion("incidentVersion"),input.observation(),create?UUID.randomUUID():null,input.initialReport(),reason,c);
+        }else {require(action.equals("void"),"Unknown inspection action");change=CropHealthChanges.voidInspection(root,linked,input.version("inspectionVersion"),input.optionalVersion("incidentVersion"),reason,c);}
+      } else {
+        // Immutable link lookup, then mandatory inspection->incident locking order and revalidation.
+        var known=store.incident(id,scope);var parent=known.inspectionId()==null?null:store.lockInspection(known.inspectionId(),scope);var root=store.lockIncident(id,scope);
+        if(action.equals("corrections")||action.equals("amendments"))change=CropHealthChanges.editIncident(root,parent,input.version("expectedVersion"),input.optionalVersion("inspectionVersion"),input.report(),action.equals("corrections"),reason,c);
+        else {
+          Kind kind=switch(action){case "triage"->Kind.TRIAGE;case "resolve"->Kind.RESOLVE;case "reopen"->Kind.REOPEN;case "void"->Kind.VOID;default->throw new Invalid("Unknown incident action");};
+          change=CropHealthChanges.transition(root,parent,input.version("expectedVersion"),input.optionalVersion("inspectionVersion"),kind,
+              kind==Kind.RESOLVE?input.instant("resolvedAt"):null,input.string("resolutionNote"),reason,c);
+        }
+      }
+      save(change);Object result=inspection?(action.equals("corrections")?paired(change):inspectionView(change.inspection(),change.incident())):view(change.incident());
+      return receipt(actor,key,path,hash,200,result,null);
+    });
+  }
+  public Object get(boolean inspection,UUID id) {
+    var actor=identity.current();feature(actor,false,false,false);UUID estate=estate(actor,id,inspection);actor.read(estate);var scope=new ReadScope(estate);
+    if(inspection){var root=store.inspection(id,scope);return inspectionView(root,linked(root,scope));}return view(store.incident(id,scope));
+  }
+  private Map<String,Object> page(Page<?> page,List<?> content){return fields("content",content,"page",page.page(),"size",page.size(),"totalElements",page.totalElements());}
+  public Object history(boolean inspection,UUID id,int page,int size) {
+    var actor=identity.current();feature(actor,false,true,false);UUID estate=estate(actor,id,inspection);actor.history(estate);
+    var result=store.history(id,inspection,new ReadScope(estate),page,size);return page(result,result.content().stream().map(CropHealthState::history).toList());
+  }
+  public Object list(InspectionFilter filter) {
+    var actor=identity.current();feature(actor,false,false,false);actor.read(filter.common().estateId());var scope=new ReadScope(filter.common().estateId());
+    var result=store.inspections(filter,scope);return page(result,result.content().stream().map(i->inspectionView(i,linked(i,scope))).toList());
+  }
+  public Object list(IncidentFilter filter) {
+    var actor=identity.current();feature(actor,false,false,false);actor.read(filter.common().estateId());var result=store.incidents(filter,new ReadScope(filter.common().estateId()));
+    return page(result,result.content().stream().map(CropHealthState::view).toList());
+  }
+}

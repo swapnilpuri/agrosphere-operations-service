@@ -209,7 +209,7 @@ class WorkforceServiceIT {
   @Test void runtimeOpenApiAndRealOutboxSnapshotsAreExportedForIndependentValidation()throws Exception{
     var w=worker();var d=day(w);write(manager,"PATCH","/api/v1/workers/"+w,Map.of("version",0,"displayName","SIMULATED Changed","reason","SIMULATED profile"),200);
     write(manager,"POST","/api/v1/attendance/days/"+d+"/void",Map.of("version",0,"reason","SIMULATED mistake"),200);
-    var response=request(manager,"GET","/v3/api-docs",null,null,200);var api=json.readTree(response.body());int count=0;for(var path:api.path("paths"))count+=path.size();assertEquals(42,count);
+    var response=request(manager,"GET","/v3/api-docs",null,null,200);var api=json.readTree(response.body());int count=0;for(var path:api.path("paths"))count+=path.size();assertEquals(70,count);
     Files.createDirectories(Path.of("target"));Files.writeString(Path.of("target/openapi-runtime.json"),response.body());
     var folder=Path.of("target/workforce-events");Files.createDirectories(folder);
     for(var row:db.queryForList("SELECT event_id,payload::text AS body FROM outbox_event")){

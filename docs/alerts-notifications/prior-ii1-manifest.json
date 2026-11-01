@@ -1,0 +1,493 @@
+{
+  "scope": "Exact prior II-1 runtime public-source fixture; no tests/private configuration; no product index dependency at execution",
+  "files": {
+    ".dockerignore": {
+      "source": ".dockerignore",
+      "sha256": "e6a30f83d0c6b7fe95376686d4475a6f7d28b31ea22fa6f2995bca47c5744172"
+    },
+    ".mvn/wrapper/maven-wrapper.properties": {
+      "source": ".mvn/wrapper/maven-wrapper.properties",
+      "sha256": "db6a3c01d5a5d6ca468479d1d931109525fef82c3b788ec0c4d01f8a9029df99"
+    },
+    "Dockerfile": {
+      "source": "Dockerfile",
+      "sha256": "f57cc4944d85b8fada9f25f513b2bb7764d8c7b2afb65bc2570e836cce58b0b0"
+    },
+    "mvnw": {
+      "source": "mvnw",
+      "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02"
+    },
+    "pom.xml": {
+      "source": "pom.xml",
+      "sha256": "dda8184b0ce3aedafbf9dc1da17b70d9650ba3ba93c9176a3b2b09e2480993b5"
+    },
+    "src/main/java/com/agrosphere/operations/Application.java": {
+      "source": "src/main/java/com/agrosphere/operations/Application.java",
+      "sha256": "76c2ed9251075256451eff89e680ee57be55ee28b324e8249ce7dd1922be30eb"
+    },
+    "src/main/java/com/agrosphere/operations/SecurityConfiguration.java": {
+      "source": "src/main/java/com/agrosphere/operations/SecurityConfiguration.java",
+      "sha256": "ef10db3fe59453aedb47a174e065f5900872ec862a58d8d50a93942a71bcc2fa"
+    },
+    "src/main/java/com/agrosphere/operations/adapter/in/messaging/package-info.java": {
+      "source": "src/main/java/com/agrosphere/operations/adapter/in/messaging/package-info.java",
+      "sha256": "2b8c016bee170a5c4ad8c884453fdd581f66ed7cbc17cebf1798f4f69d57b93f"
+    },
+    "src/main/java/com/agrosphere/operations/adapter/in/web/package-info.java": {
+      "source": "src/main/java/com/agrosphere/operations/adapter/in/web/package-info.java",
+      "sha256": "91e9b6da0379e1d616655c3a8829488b1af86a29713784931875c92d61b543e0"
+    },
+    "src/main/java/com/agrosphere/operations/adapter/out/persistence/package-info.java": {
+      "source": "src/main/java/com/agrosphere/operations/adapter/out/persistence/package-info.java",
+      "sha256": "c3dc7163ec4a6dc5acf9fbb9a508f08ed7adcf923927807f104bcc01ae24dfc2"
+    },
+    "src/main/java/com/agrosphere/operations/api/CollectionProblems.java": {
+      "source": "src/main/java/com/agrosphere/operations/api/CollectionProblems.java",
+      "sha256": "28ea3669cf2477ad8c54c15471bddec45a20e5e134ebd09f030f140b453c1e6d"
+    },
+    "src/main/java/com/agrosphere/operations/api/CorrelationFilter.java": {
+      "source": "src/main/java/com/agrosphere/operations/api/CorrelationFilter.java",
+      "sha256": "42f1a36bd0fe5a857e864b84a488184fcd3556f11cb8b848bb2fdd2097e81863"
+    },
+    "src/main/java/com/agrosphere/operations/api/LatexCollectionController.java": {
+      "source": "src/main/java/com/agrosphere/operations/api/LatexCollectionController.java",
+      "sha256": "0776554fbbe024d45ae5bfbc748bb0821b0375e6c122d84cfe74bc3591137d50"
+    },
+    "src/main/java/com/agrosphere/operations/api/Problems.java": {
+      "source": "src/main/java/com/agrosphere/operations/api/Problems.java",
+      "sha256": "595dd73da793535ce11040f1999876015042ac51f220177a653c67b4f4cb17bf"
+    },
+    "src/main/java/com/agrosphere/operations/api/TappingController.java": {
+      "source": "src/main/java/com/agrosphere/operations/api/TappingController.java",
+      "sha256": "4de9e5aa0917c002bfcd5990fcb6cae45d26e0d73ff0b1be2fc56aede155011f"
+    },
+    "src/main/java/com/agrosphere/operations/application/Access.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/Access.java",
+      "sha256": "c1dad35b99250d9d20c4b3d661c4b3597cee3130a834b4bb1b02e865f9d3ba54"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionAccess.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionAccess.java",
+      "sha256": "9ab88eb3b3d9b84407522eca12a6c8ae62529915af3a12b055811dfd4080a2fa"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionCommands.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionCommands.java",
+      "sha256": "67fc7a95d0d0bc48b541f142d49aa211794a2de4b65c14cc477d570ecda4fe6b"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionEventPort.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionEventPort.java",
+      "sha256": "94bafc3319b3c745f7bd8068b1d9ff1f72e964ca06491b8bf2f5dd8e9eba2413"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionFilters.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionFilters.java",
+      "sha256": "c9c9b1198de1983c7a1c4be25b448c60ffa9321ac1ef152e235c6c4d4dad0583"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionQueryPort.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionQueryPort.java",
+      "sha256": "9c64dded694c9f468a15c53ff82e762eccf55b0eda7bc93714a9ba86b3da1037"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionQueryService.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionQueryService.java",
+      "sha256": "71c4ee532c1f6573a00155386c617b76c0b54a28d1a5747845cfc01d0caafc6f"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionReferenceValidation.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionReferenceValidation.java",
+      "sha256": "313baf0dd77d79f7e3f02d0eb31e6831d15836c42439d52468e2c2d52ed86cdf"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionReplayStore.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionReplayStore.java",
+      "sha256": "a77821c35ad7e81d0b580f450cd45e453303770384fe6e2c662d0ad484b47635"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionRepository.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionRepository.java",
+      "sha256": "341727b01747a7c3445f8cdc7f7dab243abda67cdecc71941913edb908964229"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionScope.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionScope.java",
+      "sha256": "1a1a84031bd5786aef49d8627d2095c4b8bbf0b81df6b96f0af3c5b351fe235d"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionService.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionService.java",
+      "sha256": "9d9099d465dc3fe2b4755964263c345fc4625274b10fb77562d2e0fbeed09867"
+    },
+    "src/main/java/com/agrosphere/operations/application/CollectionSnapshots.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/CollectionSnapshots.java",
+      "sha256": "e4539b5b59d442b5a28ff495f2d64f2d7976fe73e21334e9c6f1b8d3a747f7f2"
+    },
+    "src/main/java/com/agrosphere/operations/application/DomainEvents.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/DomainEvents.java",
+      "sha256": "d3312b4c981d748b6a60b6648ae014ef4fb49a6abc07c5d8ab3bbee5d08503f2"
+    },
+    "src/main/java/com/agrosphere/operations/application/EstateValidation.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/EstateValidation.java",
+      "sha256": "44398c2dfb4e977d44fadcd013fef3f7bfa334ed471d78fe3cab030e4d55bbca"
+    },
+    "src/main/java/com/agrosphere/operations/application/Requests.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/Requests.java",
+      "sha256": "06ab35f8daae937e7e2e9ea1ec5dce3b49ab423d98a24f47bff8df8e8fbc36c4"
+    },
+    "src/main/java/com/agrosphere/operations/application/TappingRepository.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/TappingRepository.java",
+      "sha256": "d0af3b8420acde75b483934d8dc0be739a39b3c7302f43e17ffac2b565e6b11a"
+    },
+    "src/main/java/com/agrosphere/operations/application/TappingService.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/TappingService.java",
+      "sha256": "b86cbbccbb38f189a243a98dabfecaa97af82a35eeed4b7a9fcd15e866c019d0"
+    },
+    "src/main/java/com/agrosphere/operations/application/package-info.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/package-info.java",
+      "sha256": "7c08bf8d79ba880bb4398ceb23aa22ec72800f64104e3dea42ce383fe8aae89c"
+    },
+    "src/main/java/com/agrosphere/operations/application/port/out/package-info.java": {
+      "source": "src/main/java/com/agrosphere/operations/application/port/out/package-info.java",
+      "sha256": "afc37f3c463cac0b295566867163c09b608e5c18af3f03d77a7eb07e738ac4b4"
+    },
+    "src/main/java/com/agrosphere/operations/config/CollectionOpenApiConfiguration.java": {
+      "source": "src/main/java/com/agrosphere/operations/config/CollectionOpenApiConfiguration.java",
+      "sha256": "9f7fc74131426defa05b3f90fc93974ebdc8157245bd0fee019173910cc87937"
+    },
+    "src/main/java/com/agrosphere/operations/config/JwtValidationConfiguration.java": {
+      "source": "src/main/java/com/agrosphere/operations/config/JwtValidationConfiguration.java",
+      "sha256": "23739c96e5f46bbbf352f37cb23f2bc2ddcde1bb57719b4c515f03b69616df41"
+    },
+    "src/main/java/com/agrosphere/operations/config/OpenApiConfiguration.java": {
+      "source": "src/main/java/com/agrosphere/operations/config/OpenApiConfiguration.java",
+      "sha256": "248b86d7724bb89ab4add866da7d1978b2206b6fcca14698aa3029f60a6672fe"
+    },
+    "src/main/java/com/agrosphere/operations/config/RuntimeConfiguration.java": {
+      "source": "src/main/java/com/agrosphere/operations/config/RuntimeConfiguration.java",
+      "sha256": "28900d6599e3eab58a0ab0d04dedd151f8dae6b9d818d77bd2e6b604bb602383"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/api/CropHealthController.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/api/CropHealthController.java",
+      "sha256": "b9adb774e6c7c1e11b716cce8657e9aa1a8873c17974793676376dee6fd9a852"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/api/CropHealthOpenApi.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/api/CropHealthOpenApi.java",
+      "sha256": "fe7603b5f6a566fbe0d0a0f46fc227aeef8d9047ce23d088a420caa71e1a4f10"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/api/CropHealthProblems.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/api/CropHealthProblems.java",
+      "sha256": "927b905044406daa724a92da1292436005669bb17b9c10be6655664b0b72b8e3"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthChanges.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthChanges.java",
+      "sha256": "54abb1c16be822c9cbf2a74c89ee135fd45def2f8ed67979993d1018ccb762f6"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthInput.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthInput.java",
+      "sha256": "1eeeeee53987e0f9d67de78ab66516e9272e29f3f5c2fd154861242f68ebb4ab"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthPorts.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthPorts.java",
+      "sha256": "631accc49e6b70dbec1f19050a37902392892cff119b47e2e2685e563620a803"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/application/CropHealthService.java": {
+      "source": "docs/alerts-notifications/prior-ii1/CropHealthService.java.txt",
+      "sha256": "2a44e9e38cd8408468aff9678122377584b2997ff298f89264b48bca6344330d"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/domain/CropHealthRules.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/domain/CropHealthRules.java",
+      "sha256": "21a78f4fddd0e6bffebe79001232052a65416b9cdddc730188ae6290877bd7ca"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/domain/CropIncident.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/domain/CropIncident.java",
+      "sha256": "cb388cf04588af9db8629fac390d697d54f775a6f7091924b9063029b043e9ee"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/domain/FieldInspection.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/domain/FieldInspection.java",
+      "sha256": "c69282273d0072676d49d58007ef71a60203a168cb93c2dbed123a0096762554"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/infrastructure/CropHealthEstateClient.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/infrastructure/CropHealthEstateClient.java",
+      "sha256": "1737beb78744f45232a4f76e8abbb07de3034dc540884ad55155889868d29596"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/infrastructure/CropHealthState.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/infrastructure/CropHealthState.java",
+      "sha256": "318ec0ec998a5a8da6b61412144cdb11cce0ece49958a826ff7e661a440ff457"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/infrastructure/CropHealthTransactions.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/infrastructure/CropHealthTransactions.java",
+      "sha256": "5d9994f9574648e769eb6e50993d2d3652069c847a5e36359ae4bb510c5c22e6"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/infrastructure/JdbcCropHealthStore.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/infrastructure/JdbcCropHealthStore.java",
+      "sha256": "dfa5f30c01169e45fd73f2fa071d2131e1285a3243f5349ce3e18a0bf4af3859"
+    },
+    "src/main/java/com/agrosphere/operations/crophealth/infrastructure/JwtCropHealthIdentity.java": {
+      "source": "src/main/java/com/agrosphere/operations/crophealth/infrastructure/JwtCropHealthIdentity.java",
+      "sha256": "e13ba03266bc303a55c762894a18d013fc7a3ae1c486af5d490ea05a3b09096c"
+    },
+    "src/main/java/com/agrosphere/operations/domain/CollectionAdjustment.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/CollectionAdjustment.java",
+      "sha256": "0d7c5a79a100a6266aec1cca8767a4ab5c56a53b3b3bf92aa1a0a61b464cbdba"
+    },
+    "src/main/java/com/agrosphere/operations/domain/CollectionRevision.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/CollectionRevision.java",
+      "sha256": "0ac3a5d4e7bec0e79ca3eb6fd0d9131b01b607a0872e108104294242da08a925"
+    },
+    "src/main/java/com/agrosphere/operations/domain/CollectionRules.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/CollectionRules.java",
+      "sha256": "1f707923d2147431c03abbb745e63c29cf427b97aabf49ff55c774cb60fd7fa0"
+    },
+    "src/main/java/com/agrosphere/operations/domain/DrcMeasurement.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/DrcMeasurement.java",
+      "sha256": "18f1ba246ec0396552a987a916f9804d7b13feaad4e8add1908b1c71223102b3"
+    },
+    "src/main/java/com/agrosphere/operations/domain/LatexCollection.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/LatexCollection.java",
+      "sha256": "d2117a3fc389a9784ed884599fc4277be6e9760d3f0a56a23c55098e9f102ee6"
+    },
+    "src/main/java/com/agrosphere/operations/domain/Rules.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/Rules.java",
+      "sha256": "939ab9a112bd125b58b89aae2d994b3a6d31cb17267ca46aceb9fe09bd371abd"
+    },
+    "src/main/java/com/agrosphere/operations/domain/TappingAssignment.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/TappingAssignment.java",
+      "sha256": "a3c674fcaffcfcfe8ca0a08804ecd3ab5699569f5cf8afddf2dd7208288267fd"
+    },
+    "src/main/java/com/agrosphere/operations/domain/TappingMissedReason.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/TappingMissedReason.java",
+      "sha256": "beeddd638accc16fd79cff8456a4882dba15401aa957024de1a2c256c4f79c21"
+    },
+    "src/main/java/com/agrosphere/operations/domain/TappingRecord.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/TappingRecord.java",
+      "sha256": "b8435c0f66c38d09cdd62bf3c4cbc59fd14ad233ee012113bb0bd566396bbb34"
+    },
+    "src/main/java/com/agrosphere/operations/domain/TappingSchedule.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/TappingSchedule.java",
+      "sha256": "cfe4d0c80373ccc31d2ab3d6ca7e57ac4863c25bc4685170a44243f4833fbf76"
+    },
+    "src/main/java/com/agrosphere/operations/domain/package-info.java": {
+      "source": "src/main/java/com/agrosphere/operations/domain/package-info.java",
+      "sha256": "ff48bbc993ea9c14473b1ad6b6693a963527d736206c841bf570811f8439ad47"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/integration/EstateHttpClient.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/integration/EstateHttpClient.java",
+      "sha256": "da76a72f10be5ce2d8b3f80d4c8a28c2411c535484045a344d28802fcf8a0103"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/messaging/CollectionEventWriter.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/messaging/CollectionEventWriter.java",
+      "sha256": "cc4ff2cc6711b4349d0bd0f1e6770513593391f83b5f21214233bce5b6bb5802"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/messaging/Events.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/messaging/Events.java",
+      "sha256": "89fe9ff4d762ed6d367073db44202729d62eb2104d1111ad94bd58480a66a109"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/messaging/OutboxDispatcher.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/messaging/OutboxDispatcher.java",
+      "sha256": "a3fe6e3357e83118a3933035aa332581bacf15a54263c53982544598cbffae7d"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/messaging/OutboxMetrics.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/messaging/OutboxMetrics.java",
+      "sha256": "a2cfd89dcda6168459a50d4f68f17a8b11fa9416dbdf55a1c6110cf787206900"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/persistence/CollectionCommandStore.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/persistence/CollectionCommandStore.java",
+      "sha256": "3b45695dfd4fcf5bfd2d06071c571f1bdd081f11e58924010a69e4aa1473f9c9"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/persistence/CollectionQueries.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/persistence/CollectionQueries.java",
+      "sha256": "40e738d3d0f605987fc68112facf21ea616357eda8d2850b41518555cae07b81"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/persistence/CollectionStore.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/persistence/CollectionStore.java",
+      "sha256": "be41ac583cca4f7562f4ebddbb02d5fe3b7ac09d5d82e5e3a25dbcc6c45bd69a"
+    },
+    "src/main/java/com/agrosphere/operations/infrastructure/persistence/TappingStore.java": {
+      "source": "src/main/java/com/agrosphere/operations/infrastructure/persistence/TappingStore.java",
+      "sha256": "84082f19fd1464a43a820eb69e7dcd3eaa3ba0deb0e8e88d83173c6bcf7d2268"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/api/WorkforceController.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/api/WorkforceController.java",
+      "sha256": "28eccdcd70d778a2be2dd9e0a668e26d16aa4153de35a3ca52f02cb347a354c1"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/api/WorkforceOpenApi.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/api/WorkforceOpenApi.java",
+      "sha256": "9c038665e29b2ba937b2e839eb424af646fcbdfea3e6eae64edf4d9154d47530"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/api/WorkforceProblems.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/api/WorkforceProblems.java",
+      "sha256": "8fec1e2f0d12f0414f775c46ac1fc0e9435cb709141163e1a7dbe3d91819f957"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/application/WorkforceCommands.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/application/WorkforceCommands.java",
+      "sha256": "d9854a1bcb85095836b00c5bc86836c4049cb4cb6254d3e0a3ef4e90635d77cd"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/application/WorkforceEventSnapshots.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/application/WorkforceEventSnapshots.java",
+      "sha256": "c6f06ce4afa9b76b1d238f36bf6db616fd38ee25ad13b73dcecae65898087d76"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/application/WorkforcePorts.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/application/WorkforcePorts.java",
+      "sha256": "1ae2886468fc5c0ce674316fd60adbffefdd6bb6fb1fe12b89e6238b42fd56af"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/application/WorkforceQueryService.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/application/WorkforceQueryService.java",
+      "sha256": "c19b16dd9c22cd9fe29ccedf1c597ed4671648e8f291f052ff082355bd2120b2"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/application/WorkforceService.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/application/WorkforceService.java",
+      "sha256": "868766c113d0ec99b5c10922b1d694dbff9eb9a87bb65bd09819f6a7858d520d"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/application/WorkforceViews.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/application/WorkforceViews.java",
+      "sha256": "8ae266460cba29a2c56dd1d5ae46e23625751498cc76a432481f42823221a110"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/domain/AttendanceDay.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/domain/AttendanceDay.java",
+      "sha256": "312844ec55f0fcecd2212b5ebfbf1f318e04bea0f5d84197cc73543e658dfbb2"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/domain/WorkerRegistration.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/domain/WorkerRegistration.java",
+      "sha256": "83daa3dc3d0190b2421c3ecc36ac618e118d0b29312b092d3a705d82b56aa939"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/domain/WorkforceRules.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/domain/WorkforceRules.java",
+      "sha256": "c8966dc115cf0886526c4e79b3ac5c425b8639f44d6702ad6802b5c60b2b1f34"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/infrastructure/JdbcWorkforceStore.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/infrastructure/JdbcWorkforceStore.java",
+      "sha256": "1c30b7c9b0a7404d1da56a1e162d900ad4b43ea99dbc4039bbdc3d615f0befe9"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/infrastructure/JwtWorkforceIdentity.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/infrastructure/JwtWorkforceIdentity.java",
+      "sha256": "0e249d1d0941a831e5727a7895da558b8f3a6dca28c196ab7c342bb79f7f5d50"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/infrastructure/WorkforceEstateClient.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/infrastructure/WorkforceEstateClient.java",
+      "sha256": "140b8543e94c5f0045777505b54a91fa205c2e7fe5694166a965052b4be52cec"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/infrastructure/WorkforceState.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/infrastructure/WorkforceState.java",
+      "sha256": "1d65a6bde9621f7bfa55511d330487f3ebad9e8de7657a3b6fef27f2eab92a21"
+    },
+    "src/main/java/com/agrosphere/operations/workforce/infrastructure/WorkforceTransactions.java": {
+      "source": "src/main/java/com/agrosphere/operations/workforce/infrastructure/WorkforceTransactions.java",
+      "sha256": "17ac4731edcf2f7d2c3259eed18634f9fbcf25d77acec5b3f58e2050dbe5edbb"
+    },
+    "src/main/resources/application.yaml": {
+      "source": "src/main/resources/application.yaml",
+      "sha256": "1e4d7f6c3353426bfdf27e253fa0b268af69952a1954ecb8875ff2a40ae426fe"
+    },
+    "src/main/resources/contracts/COLLECTION_RELEASE.json": {
+      "source": "src/main/resources/contracts/COLLECTION_RELEASE.json",
+      "sha256": "ab98682379b5c170a446f353c16e4a627ce396774afe039e4d29d0f15ead5378"
+    },
+    "src/main/resources/contracts/CROP_HEALTH_RELEASE.json": {
+      "source": "src/main/resources/contracts/CROP_HEALTH_RELEASE.json",
+      "sha256": "a1b561fa066cc55628e1162e34f254aa073bfbe38f79547e1a766d963edadec5"
+    },
+    "src/main/resources/contracts/RELEASE": {
+      "source": "docs/alerts-notifications/prior-ii1/RELEASE",
+      "sha256": "967d9afb101346667166f2e76e81910bc190488d7d41d50ca0072e9d92f00e32"
+    },
+    "src/main/resources/contracts/WORKFORCE_RELEASE.json": {
+      "source": "src/main/resources/contracts/WORKFORCE_RELEASE.json",
+      "sha256": "076e9f5e9eec1b1419e2ec34c96f81bae38f36ecab6dc3f4191be819102a8a77"
+    },
+    "src/main/resources/contracts/events/TappingAssignmentCancelled.schema.json": {
+      "source": "src/main/resources/contracts/events/TappingAssignmentCancelled.schema.json",
+      "sha256": "71b18783088fb9b0c31de3f89ee290b9763a50039cd4264d3289088a6400d3f7"
+    },
+    "src/main/resources/contracts/events/TappingAssignmentCreated.schema.json": {
+      "source": "src/main/resources/contracts/events/TappingAssignmentCreated.schema.json",
+      "sha256": "13627255d5263816357abdf4ca14b02ee0182df786f89b1cd580a6addbfa3189"
+    },
+    "src/main/resources/contracts/events/TappingAssignmentStarted.schema.json": {
+      "source": "src/main/resources/contracts/events/TappingAssignmentStarted.schema.json",
+      "sha256": "b187cc74a92c81d4617357b1fecbf55d2b116e410f5ea9fba283239d041c82a0"
+    },
+    "src/main/resources/contracts/events/TappingCompleted.schema.json": {
+      "source": "src/main/resources/contracts/events/TappingCompleted.schema.json",
+      "sha256": "5b16dd80b6516087468223bff372c8f6cc5a5a5851c2b27771a16cc2b15b993b"
+    },
+    "src/main/resources/contracts/events/TappingMissed.schema.json": {
+      "source": "src/main/resources/contracts/events/TappingMissed.schema.json",
+      "sha256": "4c4b7695551be1dd685a377447fedec40f3a9d05a903fdc8f10e5793af1244c7"
+    },
+    "src/main/resources/contracts/events/TappingScheduleActivated.schema.json": {
+      "source": "src/main/resources/contracts/events/TappingScheduleActivated.schema.json",
+      "sha256": "554f177a23339a491930508b7241220cf6f7ce21ef4f64019ca12a39f435abac"
+    },
+    "src/main/resources/contracts/events/operations/crop-health/v1/CropHealthIncidentChanged.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/crop-health/v1/CropHealthIncidentChanged.schema.json",
+      "sha256": "c1b8f700a64d4477ea1d25b27f1463a8082a83af5619dbf68c2efcfe3eeaade7"
+    },
+    "src/main/resources/contracts/events/operations/crop-health/v1/CropHealthIncidentReported.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/crop-health/v1/CropHealthIncidentReported.schema.json",
+      "sha256": "57339d13e770fd4e54873ba2e19e31d6b91aba239042df2b604e3cd4311f26c3"
+    },
+    "src/main/resources/contracts/events/operations/crop-health/v1/FieldInspectionChanged.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/crop-health/v1/FieldInspectionChanged.schema.json",
+      "sha256": "4276a0cead25cb490f4e21943056751929b3d3348cfa9c643140260b9f0798dd"
+    },
+    "src/main/resources/contracts/events/operations/crop-health/v1/FieldInspectionRecorded.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/crop-health/v1/FieldInspectionRecorded.schema.json",
+      "sha256": "38ce1639ef2437238c256e26df5563dfd2b8549aaa639b60f39382007bc03c2c"
+    },
+    "src/main/resources/contracts/events/operations/v2/DrcMeasurementRecorded.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/v2/DrcMeasurementRecorded.schema.json",
+      "sha256": "8117eaeddafa695529c99274cff4cbeafa372664914d95b4d5f8c5b2f7c31709"
+    },
+    "src/main/resources/contracts/events/operations/v2/LatexCollectionAdjusted.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/v2/LatexCollectionAdjusted.schema.json",
+      "sha256": "985f6d66815682f06ad6e743cea517dcc8e96c99dd91f72f0234c86d7fb32fe1"
+    },
+    "src/main/resources/contracts/events/operations/v2/LatexCollectionRecorded.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/v2/LatexCollectionRecorded.schema.json",
+      "sha256": "d0dab40a2c23f751b3241f8842b180ead38e15102b699b4701827b857b58e479"
+    },
+    "src/main/resources/contracts/events/operations/v2/LatexCollectionVoided.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/v2/LatexCollectionVoided.schema.json",
+      "sha256": "a0b6270ca8d73d46bbd07225a84ecdf8d4a27e24fbaad42dbb0a41953041f989"
+    },
+    "src/main/resources/contracts/events/operations/workforce/v1/WorkerAttendanceChanged.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/workforce/v1/WorkerAttendanceChanged.schema.json",
+      "sha256": "2e1f57d724000aa0a4d2bd98f75324dc09410c73984dbfdd4495a3819c4f4881"
+    },
+    "src/main/resources/contracts/events/operations/workforce/v1/WorkerAttendanceRecorded.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/workforce/v1/WorkerAttendanceRecorded.schema.json",
+      "sha256": "3148c8c61ff06c07369da553bbf2c746fb12ce5685bed57e5d43e81a606484ac"
+    },
+    "src/main/resources/contracts/events/operations/workforce/v1/WorkerRegistrationChanged.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/workforce/v1/WorkerRegistrationChanged.schema.json",
+      "sha256": "75e9ce73349642bb75d4cad17973f4717c62290df6adc30aa0188ab4ddfa9791"
+    },
+    "src/main/resources/contracts/events/operations/workforce/v1/WorkerRegistrationCreated.schema.json": {
+      "source": "src/main/resources/contracts/events/operations/workforce/v1/WorkerRegistrationCreated.schema.json",
+      "sha256": "34699424c3441a3b97e8d137724ddb42c26485aa62a43a182f0e121da570be67"
+    },
+    "src/main/resources/contracts/operations-service.yaml": {
+      "source": "src/main/resources/contracts/previous-0.7.0/operations-service.yaml",
+      "sha256": "d93d54a038edfa9e9cdaeb6f089015571ae399855169b1fba4e26388215c8c67"
+    },
+    "src/main/resources/contracts/previous-0.5.0/operations-service.yaml": {
+      "source": "src/main/resources/contracts/previous-0.5.0/operations-service.yaml",
+      "sha256": "e242c507f3cb8aa9754b5731b2c5c32604a5ff961f11d49453e0ff2c1385498d"
+    },
+    "src/main/resources/contracts/previous-0.6.0/operations-service.yaml": {
+      "source": "src/main/resources/contracts/previous-0.6.0/operations-service.yaml",
+      "sha256": "ce0cbf3d16c90335e0bef2f379977f7e5942d501e8f26746fc3068f1c68a6310"
+    },
+    "src/main/resources/db/migration/V1__messaging_foundation.sql": {
+      "source": "src/main/resources/db/migration/V1__messaging_foundation.sql",
+      "sha256": "a7dcd975d538706cafa027625ed9393a1cc6f3c855f69a3c7fadec851c979220"
+    },
+    "src/main/resources/db/migration/V2__rubber_tapping.sql": {
+      "source": "src/main/resources/db/migration/V2__rubber_tapping.sql",
+      "sha256": "f17a05918d5e5540bf1e7c4a2cc88bb7451959198ca48d2e72c111df1cd28306"
+    },
+    "src/main/resources/db/migration/V3__latex_collection.sql": {
+      "source": "src/main/resources/db/migration/V3__latex_collection.sql",
+      "sha256": "17d87fb1ee9e861f9180b66f0ca668770b6f9a3a68c91a8cf70c3a9181ec245c"
+    },
+    "src/main/resources/db/migration/V4__worker_registration_and_attendance.sql": {
+      "source": "src/main/resources/db/migration/V4__worker_registration_and_attendance.sql",
+      "sha256": "6c673a34b1d43ae8b856a49b28890ce37fa0e9f691802c384779bb51bd4acab3"
+    },
+    "src/main/resources/db/migration/V5__inspections_and_crop_health.sql": {
+      "source": "src/main/resources/db/migration/V5__inspections_and_crop_health.sql",
+      "sha256": "da858633da5434129ce16bc06e16fee723ed061d9ff7ea846dc561c3a024d733"
+    }
+  }
+}
