@@ -18,8 +18,8 @@
       "sha256": "cae96cef89ebea3531221f4ae17c23cf8edf67d00eae8306d4186ae1bbed4d02"
     },
     "pom.xml": {
-      "source": "pom.xml",
-      "sha256": "dda8184b0ce3aedafbf9dc1da17b70d9650ba3ba93c9176a3b2b09e2480993b5"
+      "source": "docs/alerts-notifications/fixtures/prior-ii1/pom.xml",
+      "sha256": "dd2a79343c035e1a70be0125864b1506df35670deb203bf9c86cb9966561b6b7"
     },
     "src/main/java/com/agrosphere/operations/Application.java": {
       "source": "src/main/java/com/agrosphere/operations/Application.java",
