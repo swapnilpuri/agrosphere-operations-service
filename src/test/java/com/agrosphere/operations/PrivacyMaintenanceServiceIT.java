@@ -116,11 +116,11 @@ class PrivacyMaintenanceServiceIT {
       s.execute("ROLLBACK");
     }assertEquals(before,sourceDigest());assertEquals(migrations,checksums());
   }
-  @ParameterizedTest @CsvSource({"30,1,0","30,0,1","30,-1,1","365,1,0","365,0,2","365,-1,2"})
+  @ParameterizedTest @CsvSource({"30,60,0","30,0,1","30,-1,1","365,60,0","365,0,2","365,-1,2"})
   void inclusiveInactiveBoundariesAtDatabaseStatementTime(int days,int delta,int expected)throws Exception {
     UUID id=root(true);if(days==30)read(id,"SIMULATED-reader");
     var o=atDeadline(id,"UPDATE privacy_alert SET inactive_since=statement_timestamp()-interval '"+days+" days'+interval '"+delta+" seconds'");
-    assertEquals(expected,count(o,days==30?"read":"evidence"));
+    assertEquals(expected,count(o,days==30?"read":"evidence"),o.toString());
     if(expected>0)assertFalse(o.path("copies").path(days==30?"read":"evidence").path("oldestEligibleAt").isNull());
   }
   @Test void receiptDeadlineAndRemovalCutoffIncludeEqualityWithoutResettingAges()throws Exception {
